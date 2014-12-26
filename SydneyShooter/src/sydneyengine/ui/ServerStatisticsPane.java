@@ -6,9 +6,9 @@
 
 package sydneyengine.ui;
 
-import javax.swing.JLabel;
-import sydneyengine.lobby.*;
-import javax.swing.*;
+import javax.swing.JDialog;
+
+import sydneyengine.lobby.LobbyInfo;
 /**
  *
  * @author  woodwardk
@@ -67,7 +67,8 @@ public class ServerStatisticsPane extends javax.swing.JPanel {
 
         exitButton.setText("OK");
         exitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitButton(evt);
             }
         });

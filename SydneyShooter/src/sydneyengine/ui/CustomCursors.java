@@ -9,11 +9,17 @@
 
 package sydneyengine.ui;
 
-import java.awt.*;
-import javax.swing.*;
-import java.util.*;
-import java.awt.image.*;
-import java.awt.geom.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -41,24 +47,24 @@ public class CustomCursors {
 		if (img.getWidth() > preferredWidthAndHeight || img.getHeight() > preferredWidthAndHeight){
 			width = preferredWidthAndHeight;
 			height = preferredWidthAndHeight;
-			halfWidth = (int)(width/2);
-			halfHeight = (int)(height/2);
+			halfWidth = width/2;
+			halfHeight = height/2;
 		}else{
 			width = img.getWidth();
 			height = img.getHeight();
-			halfWidth = (int)(width/2);
-			halfHeight = (int)(height/2);
+			halfWidth = width/2;
+			halfHeight = height/2;
 		}
 		
 		g2D.setColor(Color.white);
 		g2D.setStroke(new BasicStroke(1));
 		int div = 4;
-		g2D.drawOval((int)(width/4), (int)(height/4), width-(int)(width/2), height-(int)(height/2));
+		g2D.drawOval(width/4, height/4, width-width/2, height-height/2);
 		
-		g2D.drawLine(0, halfHeight, halfWidth - (int)(width/div), halfHeight);
-		g2D.drawLine(halfWidth + (int)(width/div), halfHeight, width, halfHeight);
-		g2D.drawLine(halfWidth, 0, halfWidth, halfHeight - (int)(height/div));
-		g2D.drawLine(halfWidth, halfHeight + (int)(height/div), halfWidth, height);
+		g2D.drawLine(0, halfHeight, halfWidth - width/div, halfHeight);
+		g2D.drawLine(halfWidth + width/div, halfHeight, width, halfHeight);
+		g2D.drawLine(halfWidth, 0, halfWidth, halfHeight - height/div);
+		g2D.drawLine(halfWidth, halfHeight + height/div, halfWidth, height);
 		//g2D.drawLine(0, halfHeight, width, halfHeight);
 		//g2D.drawLine(halfWidth, 0, halfWidth, height);
 		whiteCrosshairCursor = toolkit.createCustomCursor(img, new Point(halfWidth,halfHeight), "whiteCrosshair");//(int)(img.getWidth()/2),(int)(img.getHeight()/2)), "crosshair");
@@ -77,26 +83,26 @@ public class CustomCursors {
 		if (img.getWidth() > preferredWidthAndHeight || img.getHeight() > preferredWidthAndHeight){
 			width = preferredWidthAndHeight;
 			height = preferredWidthAndHeight;
-			halfWidth = (int)(width/2);
-			halfHeight = (int)(height/2);
+			halfWidth = width/2;
+			halfHeight = height/2;
 		}else{
 			width = img.getWidth();
 			height = img.getHeight();
-			halfWidth = (int)(width/2);
-			halfHeight = (int)(height/2);
+			halfWidth = width/2;
+			halfHeight = height/2;
 		}
 		g2D.setColor(Color.BLACK);
 		g2D.setStroke(new BasicStroke(1));
 		int f = 0;
 		div = 3;
 		int c = 1;
-		g2D.drawOval((int)(width/4), (int)(height/4), width-(int)(width/2)+c, height-(int)(height/2)+c);
+		g2D.drawOval(width/4, height/4, width-width/2+c, height-height/2+c);
 		g2D.drawLine(halfWidth, halfHeight, halfWidth, halfHeight);
 		
-		g2D.drawLine(0, halfHeight, halfWidth - (int)(width/div), halfHeight);
-		g2D.drawLine(halfWidth + (int)(width/div), halfHeight, width-f, halfHeight);
-		g2D.drawLine(halfWidth, 0, halfWidth, halfHeight - (int)(height/div));
-		g2D.drawLine(halfWidth, halfHeight + (int)(height/div), halfWidth, height-f);
+		g2D.drawLine(0, halfHeight, halfWidth - width/div, halfHeight);
+		g2D.drawLine(halfWidth + width/div, halfHeight, width-f, halfHeight);
+		g2D.drawLine(halfWidth, 0, halfWidth, halfHeight - height/div);
+		g2D.drawLine(halfWidth, halfHeight + height/div, halfWidth, height-f);
 		/*
 		g2D.setStroke(new BasicStroke(1));
 		int n = 3;

@@ -5,13 +5,15 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.*;
+import sydneyengine.AbstractEvent;
+import sydneyengine.RewindableWorld;
 
 /**
  *
  * @author CommanderKeith
  */
 public abstract class GameEvent extends AbstractEvent{
+	@Override
 	public void apply(RewindableWorld world){
 		applyNow((GameWorld)world);
 	}

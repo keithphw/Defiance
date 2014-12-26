@@ -2,15 +2,15 @@ package kEffects;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 // ported from kwuang's c# particle emitter class
 public class ParticleEmitter
     {
         public ArrayList<Particle> particles = new ArrayList<Particle>();
-        Random r= new Random();
+        protected Random r= new Random();
         /// <summary>
         ///Initialize particle emitter
         /// </summary>
@@ -18,6 +18,7 @@ public class ParticleEmitter
         {
             if (population > 0)
             {
+            	//used to be min of 10
                 int n = Math.max(10, (int)Math.floor(Math.sqrt(population)));
                 int scatter = (int)Math.floor(Math.sqrt(population) / 4) + 5;
                 for (int i = 0; i < n; i++)
@@ -33,14 +34,18 @@ public class ParticleEmitter
                     		loc.y+ randInt(-scatter, scatter));
                     particles.add(new Particle(pt_new,
                         randInt(0, 360), c, 
-                        (float)Math.max(1, (double)Math.sqrt(population) / 10) * 1f, randInt(2, 6)));
+                        (float)Math.max(1, Math.sqrt(population) / 10) * 1f, randInt(2, 6)));
 
 
                 }
             }
         }
 
-        /// <summary>
+        public ParticleEmitter() {
+			// TODO Auto-generated constructor stub
+		}
+
+		/// <summary>
         ///draws all the particles from this particle emitter
         /// </summary>
         public void DrawParticles(Graphics g)

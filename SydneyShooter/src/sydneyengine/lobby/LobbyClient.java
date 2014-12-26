@@ -4,11 +4,14 @@
  */
 package sydneyengine.lobby;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import sydneyengine.network.ByteClientMina;
+import sydneyengine.network.ByteServerOrClient;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  * =============== IMPORTANT: This is run on the client and connects to the *CentralLobbyServer*.
@@ -46,22 +49,28 @@ public class LobbyClient {
 		}
 		infoSenderAndReceiver = new InfoSenderAndReceiver(this);
 		infoSenderAndReceiver.setDaemon(true);
+		System.out.println("LobbyClient(): LobbyClient object constructed.");
 	}
 
 	public void start() {
 		this.infoSenderAndReceiver.start();
+		
+		System.out.println("LobbyClient.start(): InfoSenderAndReceiver Started, state= " + this.infoSenderAndReceiver.getState());
 	}
 
 	public void sendNotificationOfNewHostedGame() throws IOException {
+		System.out.println("Sending notification of new hosting game...");
 		HostedGame hostedGame = new HostedGame();
 		sendMessage(CentralLobbyServer.CLIENT_TO_SERVER_NEW_HOSTED_GAME, hostedGame);
 	}
 	
 	public void sendNotificationOfExitedHostedGame() throws IOException {
+		System.out.println("Sending notification of exited hosting game...");
 		sendMessage(CentralLobbyServer.CLIENT_TO_SERVER_EXITED_HOSTED_GAME, null);
 	}
 
 	public void sendRequestForLobbyInfo() throws IOException {
+		System.out.println("Sending request for lobby info...");
 		sendMessage(CentralLobbyServer.CLIENT_TO_SERVER_REQUEST_LOBBY_INFO, null);
 	}
 
@@ -97,9 +106,6 @@ public class LobbyClient {
 		return byteClient;
 	}
 
-	
-	
-	
 	public class InfoSenderAndReceiver extends Thread {
 
 		LobbyClient lobbyClient;
@@ -107,13 +113,12 @@ public class LobbyClient {
 
 		public InfoSenderAndReceiver(LobbyClient lobbyClient) {
 			this.lobbyClient = lobbyClient;
-			
 		}
 
 		//automatically processed
+		@Override
 		public void run() {
 			Thread.currentThread().setName(this.getClass().getSimpleName() + " " + Thread.currentThread().getName());
-			System.out.println(this.getClass().getSimpleName() + ": started");
 			while (shouldRun) {
 				while (shouldRun && connected == false) {
 					try {
@@ -127,8 +132,10 @@ public class LobbyClient {
 						//System.out.println(this.getClass().getSimpleName() + ": could not connect to central server host but will keep on trying.");
 						try {
 							Thread.sleep(10000);
+							System.out.println("LobbyClient.run(): Thread successfully slept");
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							System.out.println(e);
+							//e.printStackTrace();
 						}
 						continue;
 					}

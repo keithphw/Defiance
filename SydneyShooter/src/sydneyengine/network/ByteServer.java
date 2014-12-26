@@ -9,8 +9,6 @@
 
 package sydneyengine.network;
 
-import java.io.*;
-
 /**
  *
  * @author Keith

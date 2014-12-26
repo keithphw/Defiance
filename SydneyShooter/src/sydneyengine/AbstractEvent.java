@@ -9,7 +9,7 @@
 
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
+import sydneyengine.superserializable.SSAdapter;
 /**
  * This class should be extended to make events for every action that affects the World.
  * 
@@ -36,6 +36,7 @@ public abstract class AbstractEvent extends SSAdapter implements Comparable{
 	public void setTimeStamp(double timeStamp){
 		eventWrapper.setTimeStamp(timeStamp);
 	}
+	@Override
 	public int compareTo(Object ev){
 		assert ev instanceof AbstractEvent : ev;
 		EventWrapper e = ((AbstractEvent)ev).getEventWrapper();
@@ -53,6 +54,7 @@ public abstract class AbstractEvent extends SSAdapter implements Comparable{
 		}
 	}
 	
+	@Override
 	public String toString(){
 		return super.toString()+"_"+getTimeStamp()+"_"+getSSCode()+"_id"+id+"_count"+count;
 	}

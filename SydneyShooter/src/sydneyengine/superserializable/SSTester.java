@@ -2,9 +2,13 @@ package sydneyengine.superserializable;
 
 //author: Keith Woodward
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.awt.geom.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 public class SSTester extends SSAdapter implements Serializable{
 	
@@ -39,6 +43,7 @@ public class SSTester extends SSAdapter implements Serializable{
 		array[0][1] = this;
 	}
 	
+	@Override
 	public int getSSCode(){
 		return code;
 	}
@@ -141,7 +146,7 @@ public class SSTester extends SSAdapter implements Serializable{
 			}
 			
 			
-			nanos1 = (long)(System.nanoTime() - time1);
+			nanos1 = System.nanoTime() - time1;
 			System.out.println("nanos: "+nanos1);
 			System.out.println("millis/cycle: "+nanos1/((float)numIterations*1000000));
 			System.out.println("buf.length: "+buf.length);
@@ -202,7 +207,7 @@ public class SSTester extends SSAdapter implements Serializable{
 					e.printStackTrace();
 				}
 			}
-			nanos2 = (long)(System.nanoTime() - time2);
+			nanos2 = System.nanoTime() - time2;
 			System.out.println("nanos: "+nanos2);
 			System.out.println("millis/cycle: "+nanos2/((float)numIterations*1000000));
 			System.out.println("buf.length: "+buf.length);

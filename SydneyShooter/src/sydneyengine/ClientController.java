@@ -9,11 +9,11 @@
 
 package sydneyengine;
 
-import sydneyengine.shooter.Player;
+import java.io.IOException;
+
 import sydneyengine.shooter.GameFrame;
+import sydneyengine.shooter.Player;
 import sydneyengine.shooter.ViewPane;
-import java.io.*;
-import java.util.*;
 
 /**
  *
@@ -49,6 +49,7 @@ public class ClientController extends Controller implements PlayingController{
 		fpsCounter = new FPSCounter(this);
 	}
 	
+	@Override
 	public void run(){
 		System.out.println(this.getClass().getSimpleName()+": starting");
 		long nanoTimeNow = MockSystem.nanoTime() + getServerClockDiffNanos();	// getServerClockDiffNanos() will always be zero, so don't really need it...
@@ -128,6 +129,7 @@ public class ClientController extends Controller implements PlayingController{
 		System.out.println(this.getClass().getSimpleName()+": game loop finished 2");
 	}
 	
+	@Override
 	public void close(){
 		super.close();
 		if (getReceiver() != null){
@@ -143,13 +145,16 @@ public class ClientController extends Controller implements PlayingController{
 		}
 	}
 	
+	@Override
 	public void nexusThrewException(Nexus nexus){
 		assert getNexus() == nexus : "How can the nexus that threw the error be different to the nexus in this ClientController?! There's only meant to be one nexus.";
 		getGameFrame().doStart();
 	}
+	@Override
 	public long getLatencyToServerNanos(){
 		return this.getNexus().getLatencyCalculator().getLatencyInfo().getLatencyToServerNanos();
 	}
+	@Override
 	public long getServerClockDiffNanos(){
 		return this.getNexus().getLatencyCalculator().getLatencyInfo().getServerClockDiffNanos();
 	}
@@ -162,6 +167,7 @@ public class ClientController extends Controller implements PlayingController{
 		this.nexus = nexus;
 	}
 
+	@Override
 	public ReceiverPollingClient getReceiver() {
 		return receiver;
 	}
@@ -170,6 +176,7 @@ public class ClientController extends Controller implements PlayingController{
 		this.receiver = receiver;
 	}
 
+	@Override
 	public EventStoreClient getEventStore() {
 		return eventStore;
 	}
@@ -194,26 +201,32 @@ public class ClientController extends Controller implements PlayingController{
 	public boolean isNewClientWorldUpdateAvailable() {
 		return newClientWorldUpdateAvailable;
 	}
+	@Override
 	public Player getPlayer() {
 		return player;
 	}
 
+	@Override
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
 
+	@Override
 	public ViewPane getViewPane() {
 		return viewPane;
 	}
 
+	@Override
 	public void setViewPane(ViewPane viewPane) {
 		this.viewPane = viewPane;
 	}
 	
+	@Override
 	public GameFrame getGameFrame() {
 		return gameFrame;
 	}
 
+	@Override
 	public void setGameFrame(GameFrame gameFrame) {
 		this.gameFrame = gameFrame;
 	}

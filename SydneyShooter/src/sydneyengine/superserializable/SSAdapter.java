@@ -1,10 +1,10 @@
 package sydneyengine.superserializable;
 
 //author: Keith Woodward
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
-import java.security.*;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class SSAdapter implements SSObject, Cloneable {
 
@@ -14,18 +14,22 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 		SSCodeAllocator.assignNextObjectCode(this);
 	}
 
+	@Override
 	public int getSSCode() {
 		return code;
 	}
 
+	@Override
 	public void setSSCode(int code) {
 		this.code = code;
 	}
 
+	@Override
 	public int hashCode() {
 		return code;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (object instanceof SSObject) {
 			if (this.code == ((SSObject) object).getSSCode()) {
@@ -35,6 +39,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 		return false;
 	}
 
+	@Override
 	public void collectMemberSSObjects(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> ssObjects, HashMap<Object, Object> nonSSObjects) {
 		SSTools.collectMemberSSObjects(this, fieldCache, ssObjects, nonSSObjects);
 	}
@@ -43,6 +48,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 	 * @param out
 	 * @throws java.io.IOException
 	 */
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		out.writeFields(this);
 	}
@@ -51,6 +57,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 	 * @param in
 	 * @throws java.io.IOException
 	 */
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		in.readFields(this);
 	}
@@ -59,16 +66,19 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 	SSTools.recycleSSCode(this.getSSCode());
 	}*/
 
+	@Override
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
 
+	@Override
 	public SSObject deepClone(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects) {
 		return deepClone(fieldCache, alreadyProcessedObjects, null);
 	}
 
+	@Override
 	public SSObject deepClone(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference) {
-		SSObject clone = (SSObject) alreadyProcessedObjects.modifiedGet(this.getSSCode());
+		SSObject clone = alreadyProcessedObjects.modifiedGet(this.getSSCode());
 		if (clone != null) {
 			// Since this object is already in alreadyProcessedObjects then it must have already been 
 			// deep cloned, so we just add its reference, no need to deep clone it again.
@@ -112,10 +122,12 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 		return clone;
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects) {
 		makeEqualTo(model, fieldCache, alreadyProcessedObjects, null);
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference) {
 		WeakSSObjectMap<SSObject, Object> thisObjectsSSObjects = new WeakSSObjectMap<SSObject, Object>();
 		HashMap<Object, Object> thisObjectsNonSSObjects = new HashMap<Object, Object>();
@@ -126,11 +138,12 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 		//thisObjectsSSObjects = null;
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference, WeakSSObjectMap<SSObject, Object> thisObjectsSSObjects, HashMap<Object, Object> thisObjectsNonSSObjects) {
 		//this.setSSCode(model.getSSCode());
 		SSCodeAllocator.setSSCodeForObject(this, model.getSSCode());
 
-		SSObject thisObject = (SSObject) alreadyProcessedObjects.modifiedGet(this.getSSCode());
+		SSObject thisObject = alreadyProcessedObjects.modifiedGet(this.getSSCode());
 		if (thisObject != null) {
 			// Since this object is already in alreadyProcessedObjects then it must have already had 
 			// makeEqualTo called on it.
@@ -165,7 +178,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 					}
 					if (memberOfModel instanceof SSObject) {
 						SSObject ssMemberOfModel = (SSObject) memberOfModel;
-						SSObject toBeMadeEqualToMemberOfThis = (SSObject) alreadyProcessedObjects.modifiedGet(ssMemberOfModel.getSSCode());
+						SSObject toBeMadeEqualToMemberOfThis = alreadyProcessedObjects.modifiedGet(ssMemberOfModel.getSSCode());
 						if (toBeMadeEqualToMemberOfThis == null) {
 							if (memberOfThis != null && memberOfThis instanceof SSObject && ((SSObject) memberOfThis).getSSCode() == ssMemberOfModel.getSSCode()) {
 								((SSObject) memberOfThis).makeEqualTo(ssMemberOfModel, fieldCache, alreadyProcessedObjects, memberObjectsToCopyByReference, thisObjectsSSObjects, thisObjectsNonSSObjects);
@@ -181,7 +194,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 								// we may just want to over-write the existing objects' primitives with new ones.
 								//System.err.println(this.getClass().getSimpleName() + ".makeEqualTo(...): doing clone for objectFields[i].getName() == " + objectFields[i].getName());
 								try{
-									toBeMadeEqualToMemberOfThis = (SSObject) ssMemberOfModel.shallowCloneForMakeEqualTo(fieldCache);
+									toBeMadeEqualToMemberOfThis = ssMemberOfModel.shallowCloneForMakeEqualTo(fieldCache);
 								}catch(Exception e){
 									e.printStackTrace();
 									return;
@@ -231,6 +244,7 @@ public abstract class SSAdapter implements SSObject, Cloneable {
 	}
 
 
+	@Override
 	public SSObject shallowCloneForMakeEqualTo(FieldCache fieldCache) throws Exception {
 		SSObject clone = (SSObject) this.clone();
 		//SSObject clone = SSTools.newInstance(this.getClass());

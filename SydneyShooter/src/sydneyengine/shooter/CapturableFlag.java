@@ -1,10 +1,18 @@
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+
+import sydneyengine.shooter.GameWorld;
+import sydneyengine.shooter.Player;
+import sydneyengine.shooter.SpawnFlag;
+import sydneyengine.shooter.Team;
+import sydneyengine.shooter.ViewPane;
+import sydneyengine.superserializable.SSAdapter;
 
 public class CapturableFlag extends SSAdapter {
 
@@ -48,7 +56,7 @@ public class CapturableFlag extends SSAdapter {
 			if (enemyThief.getTeam().getCapturableFlag().isAtBase() == true){
 				//SpawnFlag enemyBaseFlag = enemyThief.getTeam().getSpawnFlagBase();
 				for (SpawnFlag enemyBaseFlag : enemyThief.getTeam().getSpawnFlags()){
-					float distance = (float) Point2D.Float.distance(enemyBaseFlag.getX(), enemyBaseFlag.getY(), enemyThief.getX(), enemyThief.getY());
+					float distance = (float) Point2D.distance(enemyBaseFlag.getX(), enemyBaseFlag.getY(), enemyThief.getX(), enemyThief.getY());
 					if (distance < enemyThief.getR() + enemyBaseFlag.radius) {
 						enemyThief.addFlagCapture();
 						//System.out.println("CapturableFlag: flag successfully captured by: " + enemyThief.toString()+".... "+enemyBaseFlag.getX()+", "+enemyBaseFlag.getY()+", "+enemyThief.getX()+", "+enemyThief.getY());
@@ -68,7 +76,7 @@ public class CapturableFlag extends SSAdapter {
 					if (player.isDead() == true) {
 						continue;
 					}
-					float distance = (float) Point2D.Float.distance(dropPointX, dropPointY, player.getX(), player.getY());
+					float distance = (float) Point2D.distance(dropPointX, dropPointY, player.getX(), player.getY());
 					if (distance < player.getR() + radius) {
 						if (player.getTeam() == getTeam()) {
 							player.addFlagReturn();
@@ -88,7 +96,7 @@ public class CapturableFlag extends SSAdapter {
 				if (player.isDead() == true || player.getTeam() == getTeam()) {
 					continue;
 				}
-				float distance = (float) Point2D.Float.distance(homeX, homeY, player.getX(), player.getY());
+				float distance = (float) Point2D.distance(homeX, homeY, player.getX(), player.getY());
 				if (distance < player.getR() + radius) {
 					enemyThief = player;
 					player.setCapturableFlag(this);

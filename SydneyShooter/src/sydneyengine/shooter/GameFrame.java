@@ -8,19 +8,67 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import java.io.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
-import java.net.*;
-import java.util.prefs.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
-import sydneyengine.ui.*;
-import sydneyengine.lobby.*;
+import java.awt.BorderLayout;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import sydneyengine.ClientController;
+import sydneyengine.ConnectionWelcomer;
+import sydneyengine.Controller;
+import sydneyengine.EventStoreClient;
+import sydneyengine.EventStoreServer;
+import sydneyengine.EventWrapper;
+import sydneyengine.GameConstants;
+import sydneyengine.LatencyInfo;
+import sydneyengine.LatencyPostCard;
+import sydneyengine.MessagePack;
+import sydneyengine.Nexus;
+import sydneyengine.ReceiverPollingServer;
+import sydneyengine.Sender;
+import sydneyengine.SenderLagSimulator;
+import sydneyengine.ServerController;
+import sydneyengine.lobby.LobbyClient;
+import sydneyengine.network.Address;
+import sydneyengine.network.ByteClientMina;
+import sydneyengine.network.ConnectionServer;
+import sydneyengine.network.ConnectionServerMina;
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.FieldCache;
+import sydneyengine.superserializable.SSCodeAllocator;
+import sydneyengine.superserializable.SSObject;
+import sydneyengine.superserializable.WeakSSObjectMap;
+import sydneyengine.ui.ControlsPane;
+import sydneyengine.ui.GameDesktopPane;
+import sydneyengine.ui.HelpPane;
+import sydneyengine.ui.JoinPane;
+import sydneyengine.ui.LookAndFeelChooser;
+import sydneyengine.ui.MenuPane;
+import sydneyengine.ui.StartPane;
+import sydneyengine.ui.StatusMenu;
+import sydneyengine.ui.TeamsAndScoresPane;
 
 /**
  *
@@ -103,7 +151,7 @@ public class GameFrame extends JFrame implements GameConstants {
 			playerName = (Math.random() > 0.5 ? "Soldier" : "Digger");
 		}
 		// Setup the window
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		//Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		//setSize(1000, 800);
 		//setSize(700, 700);
 		
@@ -142,14 +190,17 @@ public class GameFrame extends JFrame implements GameConstants {
 		
 		// Let the viewPane grab the focus when this JFrame is made visible.
 		addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowOpened(WindowEvent e) {
 				/*if (getController() != null && getController().getViewPane() != null) {
 					getController().getViewPane().requestFocus();
 				}*/
 			}
 
+			@Override
 			public void windowClosing(WindowEvent e) {
 				close();
+				
 			}
 		});
 		localHost = null;
@@ -157,7 +208,6 @@ public class GameFrame extends JFrame implements GameConstants {
 			localHost = InetAddress.getLocalHost();
 			localHostNameString = localHost.getHostName();
 			localHostIPString = localHost.getHostAddress();
-			System.out.println(this.getClass().getSimpleName() + ": localHostNameString == " + localHostNameString + " localHostIPString == " + localHostIPString);
 		} catch (UnknownHostException ex) {
 			System.out.println(this.getClass().getSimpleName() + ": Can't get local host");
 			ex.printStackTrace();
@@ -179,12 +229,14 @@ public class GameFrame extends JFrame implements GameConstants {
 	}
 
 	public void doStart() {
-		System.out.println(this.getClass().getSimpleName() + ": doStart method");
+		System.out.println("------------------> "+ this.getClass().getSimpleName() + ": doStart() method started");
 		// Since this method closes the existing game, we tell the central server that 
 		// our old hosted game has ended, even though there may not have been a game before.
 		try {
 			lobbyClient.sendNotificationOfExitedHostedGame();
 		} catch (IOException e) {
+			System.out.println("Exception caught:");
+			e.printStackTrace();
 			// this isn't anything to worry about, just says there wasn't a previous game...
 		}
 
@@ -251,9 +303,9 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(false);
 			internalFrame.pack();
-			internalFrame.setLocation((int) ((getWidth() - internalFrame.getWidth()) / 2), (int) ((getHeight() - internalFrame.getHeight()) / 2));
+			internalFrame.setLocation((getWidth() - internalFrame.getWidth()) / 2, (getHeight() - internalFrame.getHeight()) / 2);
 			//And don't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 
@@ -294,16 +346,6 @@ public class GameFrame extends JFrame implements GameConstants {
 		}
 		nexus = new Nexus(byteClientMina);
 		
-//		ByteClientJGN byteClientMina = new ByteClientJGN();
-//		try {
-//			byteClientMina.connect(addr, null);
-//			serverHostNameString = addr.getHostName();
-//			serverHostIPString = addr.getAddress().getHostAddress();
-//		} catch (java.io.IOException ex) {
-//			throw ex;
-//		}
-//		nexus = new Nexus(byteClientMina);
-		
 		
 		// To simulate a clock difference as if this client and the server are on 
 		// different computers when they are actually on the same computer and there 
@@ -321,7 +363,9 @@ public class GameFrame extends JFrame implements GameConstants {
 		sender.start();
 
 		// The below encode communicates with the ConnectionWelcomerImpl class.
-		// Get the VM encode that we're meant to use.  This will be a unique number that the server and no other clients will have.  It is needed for the SS streams so new SSObjects created on this VM will not have the same SS encode as those on constructed on other VM's.
+		// Get the VM encode that we're meant to use.  This will be a unique number that the server and no other clients will have.  
+		//It is needed for the SS streams so new SSObjects created on this VM will not have the same SS encode as those 
+		// constructed on other VM's.
 		int newClientVMCode = -1;
 		System.out.println(this.getClass().getSimpleName() + ": about to try to recieve newClientVMCode");
 		MessagePack messagePack = null;
@@ -607,7 +651,7 @@ public class GameFrame extends JFrame implements GameConstants {
 		JPanel somePane = new JPanel(new BorderLayout());
 		somePane.add(viewPane, BorderLayout.CENTER);
 		StatusMenu statusMenu = viewPane.getStatusMenu();
-		JToolBar toolBar = new JToolBar(JToolBar.HORIZONTAL);
+		JToolBar toolBar = new JToolBar(SwingConstants.HORIZONTAL);
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 		toolBar.add(statusMenu);
@@ -634,9 +678,9 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(false);
 			internalFrame.pack();
-			internalFrame.setLocation((int) ((this.getWidth() - internalFrame.getWidth()) / 2), (int) ((this.getHeight() - internalFrame.getHeight()) / 2));
+			internalFrame.setLocation((this.getWidth() - internalFrame.getWidth()) / 2, (this.getHeight() - internalFrame.getHeight()) / 2);
 			//And we mustn't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 	}
@@ -656,14 +700,14 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(true);
 			internalFrame.pack();
-			int xLoc = (int) ((this.getWidth() - internalFrame.getWidth()) / 2);
-			int yLoc = (int) ((this.getHeight() - internalFrame.getHeight()) / 2);
+			int xLoc = (this.getWidth() - internalFrame.getWidth()) / 2;
+			int yLoc = (this.getHeight() - internalFrame.getHeight()) / 2;
 			if (yLoc < 0) {
 				yLoc = 0;
 			}
 			internalFrame.setLocation(xLoc, yLoc);
 			//And we mustn't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 	}
@@ -683,14 +727,14 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(true);
 			internalFrame.pack();
-			int xLoc = (int) ((this.getWidth() - internalFrame.getWidth()) / 2);
-			int yLoc = (int) ((this.getHeight() - internalFrame.getHeight()) / 2);
+			int xLoc = (this.getWidth() - internalFrame.getWidth()) / 2;
+			int yLoc = (this.getHeight() - internalFrame.getHeight()) / 2;
 			if (yLoc < 0) {
 				yLoc = 0;
 			}
 			internalFrame.setLocation(xLoc, yLoc);
 			//And we mustn't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 	}
@@ -710,14 +754,14 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(true);
 			internalFrame.pack();
-			int xLoc = (int) ((this.getWidth() - internalFrame.getWidth()) / 2);
-			int yLoc = (int) ((this.getHeight() - internalFrame.getHeight()) / 2);
+			int xLoc = (this.getWidth() - internalFrame.getWidth()) / 2;
+			int yLoc = (this.getHeight() - internalFrame.getHeight()) / 2;
 			if (yLoc < 0) {
 				yLoc = 0;
 			}
 			internalFrame.setLocation(xLoc, yLoc);
 			//And we mustn't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 	}
@@ -737,14 +781,14 @@ public class GameFrame extends JFrame implements GameConstants {
 			internalFrame.setMaximizable(false);
 			internalFrame.setClosable(true);
 			internalFrame.pack();
-			int xLoc = (int) ((this.getWidth() - internalFrame.getWidth()) / 2);
-			int yLoc = (int) ((this.getHeight() - internalFrame.getHeight()) / 2);
+			int xLoc = (this.getWidth() - internalFrame.getWidth()) / 2;
+			int yLoc = (this.getHeight() - internalFrame.getHeight()) / 2;
 			if (yLoc < 0) {
 				yLoc = 0;
 			}
 			internalFrame.setLocation(xLoc, yLoc);
 			//And we mustn't forget to add it to the desktop pane!
-			desktopPane.add(internalFrame, JDesktopPane.MODAL_LAYER);
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
 			internalFrame.setVisible(true);
 		}
 	}
@@ -768,14 +812,7 @@ public class GameFrame extends JFrame implements GameConstants {
 			Toolkit.getDefaultToolkit().beep();
 			return;
 		}
-//		try {
-//			connectionServer = new ConnectionServerJGN();
-//			connectionServer.bindAndListen(portNumTCP);
-//		} catch (java.io.IOException ex) {
-//			ex.printStackTrace();
-//			Toolkit.getDefaultToolkit().beep();
-//			return;
-//		}
+
 		Player player = new Player();
 		player.setName(getPlayerName());
 
@@ -850,7 +887,7 @@ public class GameFrame extends JFrame implements GameConstants {
 		ConnectionWelcomer connectionWelcomer = new ConnectionWelcomer(controller);
 		connectionServer.setConnectionServerListener(connectionWelcomer);
 		controller.setConnectionServer(connectionServer);
-		//controller.setConnectionServer(connectionServer);
+		controller.setConnectionServer(connectionServer);
 		/*ConnectionListener connectionListener = new ConnectionListener(controller, connectionServer, connectionWelcomer);
 		controller.setConnectionListener(connectionListener);*/
 
@@ -876,15 +913,15 @@ public class GameFrame extends JFrame implements GameConstants {
 		serverHostNameString = this.localHostNameString;
 		serverHostIPString = this.localHostIPString;
 		
-//		ConnectionServer connectionServer = null;
-//		try {
-//			connectionServer = new ConnectionServerMina();
-//			connectionServer.bindAndListen(portNumTCP);
-//		} catch (java.io.IOException ex) {
-//			ex.printStackTrace();
-//			Toolkit.getDefaultToolkit().beep();
-//			return;
-//		}
+		ConnectionServer connectionServer = null;
+		try {
+			connectionServer = new ConnectionServerMina();
+			connectionServer.bindAndListen(portNumTCP);
+		} catch (java.io.IOException ex) {
+			ex.printStackTrace();
+			Toolkit.getDefaultToolkit().beep();
+			return;
+		}
 		Player player = new Player();
 		player.setName(getPlayerName());
 
@@ -956,9 +993,9 @@ public class GameFrame extends JFrame implements GameConstants {
 			this.getController().closeAndWait(waitToCloseMillis);
 		}
 		setController(controller);
-//		ConnectionWelcomer connectionWelcomer = new ConnectionWelcomer(controller);
-//		connectionServer.setConnectionServerListener(connectionWelcomer);
-//		controller.setConnectionServer(connectionServer);
+		ConnectionWelcomer connectionWelcomer = new ConnectionWelcomer(controller);
+		connectionServer.setConnectionServerListener(connectionWelcomer);
+		controller.setConnectionServer(connectionServer);
 
 		//setTitle(title);
 		this.getDesktopPane().removeAll();
@@ -967,13 +1004,13 @@ public class GameFrame extends JFrame implements GameConstants {
 		somePane.revalidate();
 		gameThread.start();
 		newViewPane.requestFocus();
-//		if (internetGame) {
-//			try {
-//				lobbyClient.sendNotificationOfNewHostedGame();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		if (internetGame) {
+			try {
+				lobbyClient.sendNotificationOfNewHostedGame();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	// This method installs all of the classes to the SSTools class, which in turn means that all
@@ -1122,7 +1159,7 @@ public class GameFrame extends JFrame implements GameConstants {
 	}
 
 	public String getFromPrefs(String key) {
-		String obj = (String) getUserPrefs().get(key, null);
+		String obj = getUserPrefs().get(key, null);
 		return obj;
 	}
 

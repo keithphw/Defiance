@@ -13,9 +13,10 @@ package sydneyengine;
  *
  * @author CommanderKeith
  */
-import java.util.*;
-import java.io.*;
-import sydneyengine.superserializable.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSObjectInputStream;
 /**
  * MessagePack is used to keep the object, its bytes and the integer type of the message all together.
  * @author Keith

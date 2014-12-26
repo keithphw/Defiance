@@ -8,20 +8,40 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.ArrayListSS;
-import sydneyengine.ui.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Transparency;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.image.VolatileImage;
 
-import java.io.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
+import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.image.*;
-import java.net.*;
+import sydneyengine.AbstractEvent;
+import sydneyengine.Controller;
+import sydneyengine.EventWrapper;
+import sydneyengine.MockSystem;
+import sydneyengine.ui.CustomCursors;
+import sydneyengine.ui.StatusMenu;
+import sydneyengine.ui.Updatable;
 
 // good java2d option is -Dsun.java2d.trace=,count
 
@@ -89,10 +109,12 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 //		pv = new PainterVariables(this);
 	}
 
+	@Override
 	public void update(Graphics g) {
 	//System.out.println(this.getClass().getSimpleName()+": update() called********************************");
 	}
 
+	@Override
 	public void paint(Graphics g) {
 	//System.out.println(this.getClass().getSimpleName()+": paint() called********************************");
 	}
@@ -107,11 +129,12 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 
 	/**
 	 * This method is used to allow components to be modified.  Any JInternalFrames which are 
-	 * contained this.getGameFrame().getDesktopPane() that have conent pane which implements 
+	 * contained this.getGameFrame().getDesktopPane() that have content pane which implements 
 	 * Updatable will have doMove called on them.
 	 * @param seconds
 	 * @param timeAtStartOfMoveSeconds
 	 */
+	@Override
 	public void doMove(double seconds, double timeAtStartOfMoveSeconds) {
 		final Component[] componentsInDesktopPane = this.getGameFrame().getDesktopPane().getComponentsWithMainFirst();
 		final int numGlassPaneComponents = ((Container) this.getGameFrame().getGlassPane()).getComponentCount();
@@ -213,7 +236,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			//backImageGraphics2D.setTransform(getOriginalAT());
 			backImageGraphics2D.setColor(Color.BLACK);
 			String unFocusedString = "Click here to focus!";
-			backImageGraphics2D.drawString(unFocusedString, this.getCentre().x - (int) (this.getFontMetrics(backImageGraphics2D.getFont()).stringWidth(unFocusedString) / 2), this.getCentre().y);
+			backImageGraphics2D.drawString(unFocusedString, this.getCentre().x - this.getFontMetrics(backImageGraphics2D.getFont()).stringWidth(unFocusedString) / 2, this.getCentre().y);
 		}
 		// Here we paint any components like menus which are contained by the GameFrame's GameDesktopPane
 		final Component[] componentsInDesktopPane = this.getGameFrame().getDesktopPane().getComponentsWithMainFirst();
@@ -228,6 +251,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 
+					@Override
 					public void run() {
 						if (thisViewPane.isVisible() == true && thisViewPane.isShowing()) {
 							Point viewPaneLoc = thisViewPane.getLocationOnScreen();
@@ -278,18 +302,18 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 
 	protected void renderWorld(GameWorld world, Graphics2D g) {
 		// Here we set the mouse coords. Can not directly access relativeMouseXNow since it is changed 
-		// in Swing's thread, perhaps while rednering takes place. So to keep it the 
-		// same throughout rednering we store it as relativeMouseX.
+		// in Swing's thread, perhaps while rendering takes place. So to keep it the 
+		// same throughout rendering we store it as relativeMouseX.
 
 		// The following should be copies of the above, copied when rendering starts. 
-		// They can be accessed by game world objects and they won't change during rednering.
+		// They can be accessed by game world objects and they won't change during rendering.
 		relativeMouseX = relativeMouseXNow;
 		relativeMouseY = relativeMouseYNow;
 
 		showMapDescriptions = showMapDescriptionsNow;
 
-		centre.x = (float) (getWidth() / 2f);
-		centre.y = (float) (getHeight() / 2f);
+		centre.x = getWidth() / 2f;
+		centre.y = getHeight() / 2f;
 		
 		long currentTime = MockSystem.nanoTime();
 		if (lastRenderTimeNanos == -1) {
@@ -310,8 +334,8 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 		float scaledWidth = getWidth()/scaleFactor;
 		float scaledHeight = getHeight()/scaleFactor;
 		
-		viewRectInWorldCoords.x = (float)viewCenterInWorldCoords.x - scaledWidth/2f;
-		viewRectInWorldCoords.y = (float)viewCenterInWorldCoords.y - scaledHeight/2f;
+		viewRectInWorldCoords.x = viewCenterInWorldCoords.x - scaledWidth/2f;
+		viewRectInWorldCoords.y = viewCenterInWorldCoords.y - scaledHeight/2f;
 		viewRectInWorldCoords.w = scaledWidth;
 		viewRectInWorldCoords.h = scaledHeight;
 		
@@ -338,16 +362,9 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16 - 2* numMessageDisplayed));
 			
 			PersonalMessage m= player.messages.get(i);
-			/*
-			if(m.getTimeStamp()+ this.maxTimeToKeepMessageTextEventsSeconds < world.getTotalElapsedSeconds() + world.getElapsedSeconds())
-			{
-				player.messages.remove(i); 
-				//i--;
-			}	
-			*/
 
 			String message= m.message;
-			if(message.contains("Picked up")){
+			if(message.contains("Picked up")){ // picking up a weapon
 				g.setColor(Color.black);
 			}else if(message.contains("out of ammo")){
 				g.setColor(Color.red);
@@ -356,10 +373,10 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			}else if(message.contains("Obtained")){
 				// for non-weapon items
 				g.setColor(Color.blue);
-			}else if(message.contains("STUNNED"))
-			{
+			}else if(message.contains("STUNNED")) {
 				g.setColor(Color.white);
 			}
+			else g.setColor(Color.black);
 			
 			g.drawString(message, this.getWidth()/3, 100 + lineHeight*numMessageDisplayed);
 			
@@ -374,7 +391,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 		
 		
 		
-		if (this.isSHOW_STATS()){
+		if (isSHOW_STATS()){
 			g.setTransform(originalTransform);
 			g.setColor(Color.RED);
 			int xStringCoord = 20;
@@ -382,21 +399,21 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			int yStringInc = 15;
 			int stringCounter = 0;
 			g.drawString("IP: "+getGameFrame().serverHostIPString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
-			g.drawString("Server Host: "+ getGameFrame().serverHostNameString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("Server Host Name: "+ getGameFrame().serverHostNameString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			//g.drawString("FPS: " + this.getGameFrame().getController().getFPSCounter().getFPSRounded(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			g.drawString("Millis/frame: " + Math.round(getGameFrame().getController().getFPSCounter().getAvTimeBetweenUpdatesMillis() * 10) / 10.0, xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			int seconds = (int) this.getPlayer().getWorld().getTotalElapsedSeconds();
-			g.drawString("Time: " + seconds + (seconds % 2 == 0 ? "*" : ""), xStringCoord, yStringCoord + yStringInc * stringCounter++);
-			g.drawString("usedMemory: " + (Math.round(getGameFrame().getController().getFPSCounter().getUsedMemory() / 10000f) / 100f) + " M", xStringCoord, yStringCoord + yStringInc * stringCounter++);
-			g.drawString("freeMemory: " + (Math.round(getGameFrame().getController().getFPSCounter().getFreeMemory() / 10000f) / 100f) + " M", xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("UpTime: " + seconds + (seconds % 2 == 0 ? "*" : ""), xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("Used Memory: " + (Math.round(getGameFrame().getController().getFPSCounter().getUsedMemory() / 10000f) / 100f) + " M", xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("Free Memory: " + (Math.round(getGameFrame().getController().getFPSCounter().getFreeMemory() / 10000f) / 100f) + " M", xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			//System.out.println(this.getClass().getSimpleName()+": getUsedMemory() == "+(Math.round(getGameFrame().getController().getFPSCounter().getUsedMemory() / 10000f) / 100f));
 			//System.out.println(this.getClass().getSimpleName()+": getFreeMemory() == "+(Math.round(getGameFrame().getController().getFPSCounter().getFreeMemory() / 10000f) / 100f));
 			long latencyFromServerToThisVMNanos = getGameFrame().getController().getLatencyToServerNanos();
-			g.drawString("Latency: " + Math.round(latencyFromServerToThisVMNanos / 1000000f), xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("Latency (millis): " + Math.round(latencyFromServerToThisVMNanos / 1000000f), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			long serverClockDiffNanos = getGameFrame().getController().getServerClockDiffNanos();
 			//g.drawString("Clock diff: " + Math.round(serverClockDiffNanos / 1000000f), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			g.drawString("getNumDoMaxTimeMoves(): " + world.getNumDoMaxTimeMoves(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
-			g.drawString("ssout.getNumStoredObjects(): " + world.getController().getSSOut().getNumStoredObjects(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
+			g.drawString("Stored Objects: " + world.getController().getSSOut().getNumStoredObjects(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 
 			//g.drawString("getWorldMouseX() == " + getWorldMouseX(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			//g.drawString("getWorldMouseY() == " + getWorldMouseY(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
@@ -414,6 +431,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	}
 	
 	
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
 			scaleUp = true;
@@ -435,6 +453,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 		sendEvent(playerKeyEvent);
 	}
 
+	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
 			scaleUp = false;
@@ -451,9 +470,11 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 		sendEvent(playerKeyEvent);
 	}
 
+	@Override
 	public void keyTyped(KeyEvent e) {
 	}
 
+	@Override
 	public void mousePressed(MouseEvent e) {
 		if (hasFocus() == false) {
 			requestFocus();
@@ -461,16 +482,20 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 		doMouseEvent(e, PlayerMouseEvent.MOUSE_PRESS);
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		doMouseEvent(e, PlayerMouseEvent.MOUSE_RELEASE);
 	}
 
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseExited(MouseEvent e) {
 	}
 
@@ -478,6 +503,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	long lastMouseMovedEventSystemTime = 0;
 	boolean lastMouseMovedEventSent = true;
 	long minNanosBetweenMouseMoveEventSends = 50000000;	// 0.05 seconds
+	@Override
 	public void mouseDragged(MouseEvent e) {
 		lastMouseMovedEvent = e;
 		long timeNow = MockSystem.nanoTime();
@@ -490,6 +516,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			lastMouseMovedEventSent = false;
 		}
 	}
+	@Override
 	public void mouseMoved(MouseEvent e) {
 		lastMouseMovedEvent = e;
 		long timeNow = MockSystem.nanoTime();
@@ -504,15 +531,19 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	}
 
 	protected void doMouseEvent(MouseEvent e, int eventType) {
-		float mx = (float) ((e.getPoint().x - centre.x) / this.getScaleFactor());
-		float my = (float) ((e.getPoint().y - centre.y) / this.getScaleFactor());
+		float mx = (e.getPoint().x - centre.x) / this.getScaleFactor();
+		float my = (e.getPoint().y - centre.y) / this.getScaleFactor();
 
 		PlayerMouseEvent playerMouseEvent = new PlayerMouseEvent(getPlayer(), eventType, mx, my, e.getButton());
+		
+		// only send mouse events that aren't mouse move?
+		//if(!(playerMouseEvent.getMouseEventType()==103))
 		sendEvent(playerMouseEvent);
 		relativeMouseXNow = mx;
 		relativeMouseYNow = my;
 	}
 
+	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		PlayerMouseWheelEvent playerMouseWheelEvent = new PlayerMouseWheelEvent(getPlayer(), e.getWheelRotation());
 		sendEvent(playerMouseWheelEvent);
@@ -525,7 +556,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	// This is a convenience method.
 	// Note: this method can be called from any thread since the last line:
 	// getController().getEventStore().addEventFromViewPane(e);
-	// is synchronized. However, in thsi game this method is only called by the 
+	// is synchronized. However, in this game this method is only called by the 
 	// main game loop thread so the EventStore's synchronization is not needed 
 	// (but it's not chucked out).
 	public void sendEvent(EventWrapper e) {
@@ -606,7 +637,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	 * @return
 	 */
 	public float getWorldMouseX() {
-		return (float)player.getX() + relativeMouseX;
+		return player.getX() + relativeMouseX;
 	}
 
 	/**
@@ -614,7 +645,7 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 	 * @return
 	 */
 	public float getWorldMouseY() {
-		return (float)player.getY() + relativeMouseY;
+		return player.getY() + relativeMouseY;
 	}
 
 	public boolean isShowMapDescriptions() {

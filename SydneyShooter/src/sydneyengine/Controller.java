@@ -2,12 +2,13 @@ package sydneyengine;
 
 // author: Keith Woodward, keithphw@hotmail.com
 
+import java.io.IOException;
+
 import sydneyengine.shooter.GameWorld;
 import sydneyengine.shooter.Player;
 import sydneyengine.shooter.ViewPane;
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.io.*;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  * Controller contains the game loop which runs everything. It should get new messages, update the game world, render and sleep. 
  * @author woodwardk
@@ -145,6 +146,7 @@ public abstract class Controller implements Runnable{
 		}
 	}
 	public void unpause(){
+		System.out.println("Controller: Unpause() method:");
 		synchronized (waitForPauseMutex){
 			shouldPause = false;
 			System.out.println(this.getClass().getSimpleName()+": waitForPauseMutex.notifyAll();");

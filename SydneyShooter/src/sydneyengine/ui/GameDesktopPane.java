@@ -9,16 +9,12 @@
 
 package sydneyengine.ui;
 
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.image.*;
-import sydneyengine.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+
+import javax.swing.JDesktopPane;
+import javax.swing.JLayeredPane;
 
 /**
  *
@@ -43,30 +39,35 @@ public class GameDesktopPane extends JDesktopPane{
 		this.setFocusable(false);
 	}
 	
+	@Override
 	public void setSize(int width, int height){
 		super.setSize(width,height);
 		if (mainComponent != null){
 			mainComponent.setSize(width, height);
 		}
 	}
+	@Override
 	public void setSize(Dimension d){
 		super.setSize(d);
 		if (mainComponent != null){
 			mainComponent.setSize(d);
 		}
 	}
+	@Override
 	public void setBounds(int x, int y, int width, int height) {
 		super.setBounds(x,y,width,height);
 		if (mainComponent != null){
 			mainComponent.setSize(width, height);
 		}
 	}
+	@Override
 	public void update(Graphics g){
 		if (getMainComponent() == null){
 			return;
 		}
 		super.update(g);
 	}
+	@Override
 	public void paint(Graphics g){
 		if (getMainComponent() == null){
 			return;
@@ -81,7 +82,7 @@ public class GameDesktopPane extends JDesktopPane{
 			this.remove(mainComponent);
 		}
 		if (newMainComponent != null){
-			this.add(newMainComponent, JDesktopPane.DEFAULT_LAYER);
+			this.add(newMainComponent, JLayeredPane.DEFAULT_LAYER);
 			newMainComponent.setBounds(0,0,this.getWidth(),this.getHeight());
 		}
 		this.mainComponent = newMainComponent;
@@ -92,6 +93,7 @@ public class GameDesktopPane extends JDesktopPane{
 		}
 		super.remove(c);
 	}*/
+	@Override
 	public void removeAll(){
 		this.mainComponent = null;
 		super.removeAll();

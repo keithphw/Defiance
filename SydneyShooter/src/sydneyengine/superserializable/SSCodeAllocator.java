@@ -5,9 +5,8 @@
 
 package sydneyengine.superserializable;
 
-import com.grexengine.jgf.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -28,7 +27,7 @@ public class SSCodeAllocator {
 		// need to add at least one WeakSSObjectMap to the ssObjectMaps list.
 		ssObjectMaps.add(new WeakSSObjectMap<SSObject, Object>());
 	}
-	static int ssCodesIssuedBetweenPrintWarnings = (int) Math.round(MAX_OBJECTCODE / 10);
+	static int ssCodesIssuedBetweenPrintWarnings = Math.round(MAX_OBJECTCODE / 10);
 	protected static int lastObjectCode = -1;
 	private static Object lastObjectCodeMutex = new Object();
 	protected static int vMCode = 0;
@@ -42,8 +41,8 @@ public class SSCodeAllocator {
 
 	public static int[] decode(int ab) {
 		int[] ints = new int[2];
-		ints[0] = (int) (ab >> shifts);
-		ints[1] = (int) (ab - (ints[0] << shifts));
+		ints[0] = ab >> shifts;
+		ints[1] = ab - (ints[0] << shifts);
 		return ints;
 	}
 

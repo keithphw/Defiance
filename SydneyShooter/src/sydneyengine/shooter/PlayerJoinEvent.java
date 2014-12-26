@@ -8,10 +8,14 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sydneyengine.Controller;
+import sydneyengine.EventWrapper;
+import sydneyengine.superserializable.SSObject;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  *
  * @author CommanderKeith
@@ -28,6 +32,7 @@ public class PlayerJoinEvent extends GameEvent {
 		this.player = player;
 	}
 
+	@Override
 	public void applyNow(GameWorld world) {
 		assert world != null;
 		assert world.isHead();
@@ -57,6 +62,7 @@ public class PlayerJoinEvent extends GameEvent {
 		getEventWrapper().setController(controller);
 	}
 
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		// Write the player object and its fields without writing the whole game world.
 		// Note that this means that the player object will have a null World when it is created on the server in the readSS method below.
@@ -71,6 +77,7 @@ public class PlayerJoinEvent extends GameEvent {
 		out.writeFields(this);
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		assert this.getEventWrapper() == null : "this.wrapperEvent should be null when this event is deserialized because, the fact that it is non-null may indicate that this event has been deserailized more than once, or there is some other problem.";
 		player = (Player) in.readObject();

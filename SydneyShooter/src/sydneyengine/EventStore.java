@@ -15,9 +15,11 @@
 
 package sydneyengine;
 
-import java.io.*;
-import java.util.*;
-import sydneyengine.superserializable.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import sydneyengine.superserializable.ArrayListSS;
 
 /**
  *
@@ -47,6 +49,7 @@ public abstract class EventStore{
 			this.shouldSend = shouldSend;
 			this.nexusToNotSendTo = nexusToNotSendTo;;
 		}
+		@Override
 		public int compareTo(Object ev){
 			EventWrapper e = ((WrapperEventHolder)ev).getEvent();
 			EventWrapper thisE = this.getEvent();

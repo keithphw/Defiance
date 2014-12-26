@@ -9,9 +9,8 @@
 
 package sydneyengine;
 
-import java.io.*;
-import java.util.*;
-import sydneyengine.superserializable.*;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  *
@@ -20,17 +19,20 @@ import sydneyengine.superserializable.*;
 public class EventStoreServer extends EventStore{
 	ServingController controller;
 	
+	@Override
 	public ServingController getController(){
 		return controller;
 	}
 	public void setController(ServingController controller){
 		this.controller = controller;
 	}
+	@Override
 	public void addEventFromReceiver(EventWrapper e, Nexus fromNexus){
 		synchronized (newEventsTempParkingMutex){
 			newEventsTempParking.add(new WrapperEventHolder(e, true, fromNexus));
 		}
 	}
+	@Override
 	protected void sendNewEvents(ArrayList<WrapperEventHolder> eventsToSend){
 		ArrayList<Nexus> copyOfNexuses = getController().getCopyOfNexuses();
 		for (int i = 0; i < eventsToSend.size(); i++){

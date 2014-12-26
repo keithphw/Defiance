@@ -5,8 +5,6 @@
 
 package sydneyengine.network;
 
-import sydneyengine.*;
-
 /**
  *
  * @author woodwardk

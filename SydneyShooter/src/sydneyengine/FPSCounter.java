@@ -43,7 +43,7 @@ public class FPSCounter{
 		lastUpdateNanos = newUpdateNanos;
 		counter++;
 		if (cumulativeTimeBetweenUpdatesNanos >= timeBetweenUpdatesNanos){
-			avTimeBetweenUpdatesMillis = (float)((cumulativeTimeBetweenUpdatesNanos)/(counter*1000000f));
+			avTimeBetweenUpdatesMillis = (cumulativeTimeBetweenUpdatesNanos)/(counter*1000000f);
 			freeMemory = Runtime.getRuntime().freeMemory();
 			totalMemory = Runtime.getRuntime().totalMemory();
 			usedMemory = totalMemory - freeMemory;
@@ -59,7 +59,7 @@ public class FPSCounter{
 		return Math.round(getAvTimeBetweenUpdatesMillis());
 	}
 	public float getFPS(){
-		return (float)(getAvTimeBetweenUpdatesMillis() != 0 ? 1000f/getAvTimeBetweenUpdatesMillis() : -1);
+		return getAvTimeBetweenUpdatesMillis() != 0 ? 1000f/getAvTimeBetweenUpdatesMillis() : -1;
 	}
 	public int getFPSRounded(){
 		return Math.round(this.getFPS());

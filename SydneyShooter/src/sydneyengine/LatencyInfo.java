@@ -9,9 +9,7 @@
 
 package sydneyengine;
 
-import java.util.*;
-import java.io.*;
-import sydneyengine.superserializable.*;
+import sydneyengine.superserializable.SSAdapter;
 /**
  * Stores the server clock difference and latency between the Nexus on the client and the Nexus on the server.
  * The server clock difference is defined as the time that you have to add onto the client's clock time to get the server's clock time. So (client)System.nanoTIme() + getServerClockDiffNanos() == (server)System.nanoTime().

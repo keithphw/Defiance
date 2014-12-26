@@ -4,72 +4,87 @@
  */
 package sydneyengine.network;
 
-import org.apache.mina.transport.socket.nio.*;
-import org.apache.mina.common.*;
-import org.apache.mina.filter.*;
-import org.apache.mina.filter.codec.*;
-import org.apache.mina.filter.codec.textline.*;
-import java.net.*;
-import java.util.*;
+import java.net.InetSocketAddress;
+
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.compression.CompressionFilter;
+import org.apache.mina.transport.socket.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 public class ConnectionServerMina extends IoHandlerAdapter implements ConnectionServer{
-	IoAcceptor acceptor;
+	SocketAcceptor acceptor;
 	ConnectionServerListener listener;
 	
 	public ConnectionServerMina(){
 	}
 	
+	@Override
 	public void bindAndListen(int port) throws java.io.IOException {
-		acceptor = new SocketAcceptor();
-		SocketAcceptorConfig config = new SocketAcceptorConfig();
-		config.getSessionConfig().setTcpNoDelay(true);
+		acceptor = new NioSocketAcceptor();
+		acceptor.setReuseAddress(true);
 		acceptor.getFilterChain().addLast("compressor", new CompressionFilter());
 		acceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new ByteArrayCodecFactory()));
-		
+		acceptor.getSessionConfig().setTcpNoDelay(true);
 		//chain.addLast("logger", new LoggingFilter());
 
-		acceptor.bind(new InetSocketAddress(port), this, config);
+		acceptor.setDefaultLocalAddress(new InetSocketAddress(port));
+		acceptor.setHandler(this);
+		acceptor.bind();
+		
 		System.out.println(this.getClass().getSimpleName()+": Listening...");
 	}
 	
+	@Override
 	public void close(){
 		System.out.println(this.getClass().getSimpleName() + ": closing 1");
-		acceptor.unbindAll();
+		acceptor.unbind();
 		System.out.println(this.getClass().getSimpleName() + ": closing 2");
 	}
 	
+	@Override
 	public void sessionCreated(IoSession session) throws Exception {
     }
 
-    public void sessionOpened(IoSession session) throws Exception {
+    @Override
+	public void sessionOpened(IoSession session) throws Exception {
 		System.out.println(this.getClass().getSimpleName()+": sessionOpened!");
 		// Make a new ByteServerMina:
 		ByteServerMina byteServerImplMina = new ByteServerMina(session);
-		session.setAttachment(byteServerImplMina);
+		session.setAttribute("",byteServerImplMina);
 		// Then let the ByteServerMina do its thing
 		byteServerImplMina.sessionOpened(session);
 		getConnectionServerListener().connectionMade(byteServerImplMina);
     }
 
+	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		// pass on the method call:
-		((ByteServerMina)session.getAttachment()).messageReceived(session, message);
+		
+		((ByteServerMina)session.getAttribute("")).messageReceived(session, message);
 	}
 	
+	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		// pass on the method call:
-		((ByteServerMina)session.getAttachment()).sessionClosed(session);
+
+		((ByteServerMina)session.getAttribute("")).sessionClosed(session);
 	}
 	
+	@Override
 	public void exceptionCaught(IoSession session, Throwable cause) {
 		// pass on the method call:
-		((ByteServerMina)session.getAttachment()).exceptionCaught(session, cause);
+
+		((ByteServerMina)session.getAttribute("")).exceptionCaught(session, cause);
 	}
 
+	@Override
 	public ConnectionServerListener getConnectionServerListener() {
 		return listener;
 	}
 
+	@Override
 	public void setConnectionServerListener(ConnectionServerListener listener) {
 		this.listener = listener;
 	}

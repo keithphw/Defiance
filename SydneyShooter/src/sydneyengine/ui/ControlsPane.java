@@ -8,21 +8,35 @@
  */
 package sydneyengine.ui;
 
-import sydneyengine.shooter.ViewPane;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+
+import sydneyengine.ClientController;
+import sydneyengine.Controller;
+import sydneyengine.EventWrapper;
+import sydneyengine.ReceiverPolling;
+import sydneyengine.SenderLagSimulator;
+import sydneyengine.ServerController;
+import sydneyengine.ServingController;
 import sydneyengine.shooter.GameFrame;
-import java.io.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.net.*;
-import java.lang.reflect.*;
-import sydneyengine.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
+import sydneyengine.shooter.ViewPane;
 
 /**
  *
@@ -103,7 +117,7 @@ public class ControlsPane extends JPanel {
 					"This reduces responsiveness for this player but it reduces the jumpyness that other players see<br>" +
 					"since the event is sent to the server (and then clients) straight away and the delay time can act as a buffer.</html>");
 			eventDelayField = new JTextField("" + EventWrapper.getStaticTimeDelayBeforeEventApplied(), textFieldColumns);
-			eventDelayField.setHorizontalAlignment(JTextField.RIGHT);
+			eventDelayField.setHorizontalAlignment(SwingConstants.RIGHT);
 			JPanel panel3 = new JPanel(new BorderLayout());
 			panel3.add(eventDelayLabel, BorderLayout.WEST);
 			panel3.add(eventDelayField, BorderLayout.EAST);
@@ -113,7 +127,7 @@ public class ControlsPane extends JPanel {
 		millisToSleepBetweenUpdatesLabel.setToolTipText("<html>This is the sleep time between frames.  The higher it is, the lower the frames per second (FPS).<br>" +
 				"In general it should be at least one so that the other threads are given a turn to run and do their job.</html>");
 		millisToSleepBetweenUpdatesField = new JTextField("" + getGameFrame().getController().getSleepBetweenUpdatesMillis(), textFieldColumns);
-		millisToSleepBetweenUpdatesField.setHorizontalAlignment(JTextField.RIGHT);
+		millisToSleepBetweenUpdatesField.setHorizontalAlignment(SwingConstants.RIGHT);
 		JPanel panel4 = new JPanel(new BorderLayout());
 		panel4.add(millisToSleepBetweenUpdatesLabel, BorderLayout.WEST);
 		panel4.add(millisToSleepBetweenUpdatesField, BorderLayout.EAST);
@@ -124,7 +138,7 @@ public class ControlsPane extends JPanel {
 					"Note that a value of -1 means that the clients should never be sent the GameWorld as an update.<br>" +
 					"If the value is very small like 1, an update will be sent after each frame (this can be inefficent!).</html>");
 			minTimeBetweenClientUpdatesNanosField = new JTextField("" + ((ServerController) getGameFrame().getController()).getMinTimeBetweenClientUpdatesNanos(), textFieldColumns);
-			minTimeBetweenClientUpdatesNanosField.setHorizontalAlignment(JTextField.RIGHT);
+			minTimeBetweenClientUpdatesNanosField.setHorizontalAlignment(SwingConstants.RIGHT);
 			JPanel panel6 = new JPanel(new BorderLayout());
 			panel6.add(nanoTimeBetweenClientUpdatesLabel, BorderLayout.WEST);
 			panel6.add(minTimeBetweenClientUpdatesNanosField, BorderLayout.EAST);
@@ -135,12 +149,12 @@ public class ControlsPane extends JPanel {
 			maxLatencyLabel.setToolTipText("<html>The max latency (the time it takes to send bytes to the server).  The latency of each message<br>" +
 					"will be between min and maxLatency and the order of the messages is still guaranteed.</html>");
 			maxLatencyField = new JTextField("" + ((SenderLagSimulator) getGameFrame().getController().getSender()).getMaxLagNanos(), textFieldColumns);
-			maxLatencyField.setHorizontalAlignment(JTextField.RIGHT);
+			maxLatencyField.setHorizontalAlignment(SwingConstants.RIGHT);
 			minLatencyLabel = new JLabel("SenderLagSimulator.setMinLagNanos() ");
 			minLatencyLabel.setToolTipText("<html>The min latency (the time it takes to send bytes to the server).  The latency of each message<br>" +
 					"will be between min and maxLatency and the order of the messages is still guaranteed.</html>");
 			minLatencyField = new JTextField("" + ((SenderLagSimulator) getGameFrame().getController().getSender()).getMinLagNanos(), textFieldColumns);
-			minLatencyField.setHorizontalAlignment(JTextField.RIGHT);
+			minLatencyField.setHorizontalAlignment(SwingConstants.RIGHT);
 			JPanel panel = new JPanel(new BorderLayout());
 			panel.add(maxLatencyLabel, BorderLayout.WEST);
 			panel.add(maxLatencyField, BorderLayout.EAST);
@@ -154,11 +168,11 @@ public class ControlsPane extends JPanel {
 		eventTimeStampMultipleSecondsLabel = new JLabel("world.setEventTimeStampMultipleSeconds()");
 		eventTimeStampMultipleSecondsLabel.setToolTipText("<html>For performance reasons, events are grouped together in multiples of this number.</html>");
 		eventTimeStampMultipleSecondsField = new JTextField("" + getGameFrame().getController().getWorld().getEventTimeStampMultipleSeconds(), textFieldColumns);
-		eventTimeStampMultipleSecondsField.setHorizontalAlignment(JTextField.RIGHT);
+		eventTimeStampMultipleSecondsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		worldMaxUpdateElapsedSecondsLabel = new JLabel("world.setMaxUpdateElapsedSeconds()");
 		worldMaxUpdateElapsedSecondsLabel.setToolTipText("<html>The maximum time that the world can be updated by. If the time exceeds this, it is broken into smaller time-chunks and each time chunk is processed.<br>This should be slightly bigger than world.eventTimeStampMultipleSeconds</html>");
 		worldMaxUpdateElapsedSecondsField = new JTextField("" + getGameFrame().getController().getWorld().getMaxUpdateElapsedSeconds(), textFieldColumns);
-		worldMaxUpdateElapsedSecondsField.setHorizontalAlignment(JTextField.RIGHT);
+		worldMaxUpdateElapsedSecondsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		JPanel panela = new JPanel(new BorderLayout());
 		panela.add(eventTimeStampMultipleSecondsLabel, BorderLayout.WEST);
 		panela.add(eventTimeStampMultipleSecondsField, BorderLayout.EAST);
@@ -176,12 +190,12 @@ public class ControlsPane extends JPanel {
 		worldMaxTimeGapSecondsLabel.setToolTipText("<html>The max latency (the time it takes to send bytes to the server).  The latency of each message<br>" +
 				"will be between min and maxLatency and the order of the messages is still guaranteed.</html>");
 		worldMaxTimeGapSecondsField = new JTextField("" + getGameFrame().getController().getWorld().getMaxTimeGapSeconds(), textFieldColumns);
-		worldMaxTimeGapSecondsField.setHorizontalAlignment(JTextField.RIGHT);
+		worldMaxTimeGapSecondsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		worldMinTimeGapSecondsLabel = new JLabel("world.setMinTimeGapSeconds()");
 		worldMinTimeGapSecondsLabel.setToolTipText("<html>The min latency (the time it takes to send bytes to the server).  The latency of each message<br>" +
 				"will be between min and maxLatency and the order of the messages is still guaranteed.</html>");
 		worldMinTimeGapSecondsField = new JTextField("" + getGameFrame().getController().getWorld().getMinTimeGapSeconds(), textFieldColumns);
-		worldMinTimeGapSecondsField.setHorizontalAlignment(JTextField.RIGHT);
+		worldMinTimeGapSecondsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		if (getGameFrame().getController() instanceof ClientController) {
 			worldMinTimeGapSecondsField.setEditable(false);
 			worldMaxTimeGapSecondsField.setEditable(false);
@@ -189,7 +203,7 @@ public class ControlsPane extends JPanel {
 		eventStoreMinSecondsToKeepUserEventsLabel = new JLabel("EventStore.setMinSecondsToKeepUserEvents()");
 		eventStoreMinSecondsToKeepUserEventsLabel.setToolTipText("<html>The The minimum amount of seconds that events are kept in the events list.</html>");
 		eventStoreMinSecondsToKeepUserEventsField = new JTextField("" + getGameFrame().getController().getEventStore().getMinSecondsToKeepUserEvents(), textFieldColumns);
-		eventStoreMinSecondsToKeepUserEventsField.setHorizontalAlignment(JTextField.RIGHT);
+		eventStoreMinSecondsToKeepUserEventsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(worldMinTimeGapSecondsLabel, BorderLayout.WEST);
 		panel.add(worldMinTimeGapSecondsField, BorderLayout.EAST);
@@ -208,7 +222,7 @@ public class ControlsPane extends JPanel {
 			sleepTimeAfterNoMoreRecievesLabel.setToolTipText("<html>The sleep time after all players' nexus's have had recieve() called on them until they returned null.<br>" +
 					"This should be at least 1 or else the RelayerPolling thread will hog the processor and not let the other threads do their job.</html>");
 			sleepTimeAfterNoMoreRecievesField = new JTextField("" + ((ReceiverPolling) ((ServerController) getGameFrame().getController()).getReceiver()).getSleepTimeAfterNoMoreRecievesMillis(), textFieldColumns);
-			sleepTimeAfterNoMoreRecievesField.setHorizontalAlignment(JTextField.RIGHT);
+			sleepTimeAfterNoMoreRecievesField.setHorizontalAlignment(SwingConstants.RIGHT);
 			JPanel panel6 = new JPanel(new BorderLayout());
 			panel6.add(sleepTimeAfterNoMoreRecievesLabel, BorderLayout.WEST);
 			panel6.add(sleepTimeAfterNoMoreRecievesField, BorderLayout.EAST);
@@ -222,6 +236,7 @@ public class ControlsPane extends JPanel {
 		exitButton = new JButton("Update and Resume Game");
 		exitButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				UPDATE();
 				

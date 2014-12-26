@@ -9,11 +9,14 @@
 
 package sydneyengine;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
+import sydneyengine.network.ByteServerOrClient;
 import sydneyengine.shooter.Player;
-import java.util.*;
-import java.io.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *

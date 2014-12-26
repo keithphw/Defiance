@@ -33,7 +33,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package com.jcraft.jzlib;
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ZInputStream extends FilterInputStream {
 
@@ -73,7 +75,8 @@ public class ZInputStream extends FilterInputStream {
     return inf.finished() ? 0 : 1;
   }*/
 
-  public int read() throws IOException {
+  @Override
+public int read() throws IOException {
     if(read(buf1, 0, 1)==-1)
       return(-1);
     return(buf1[0]&0xFF);
@@ -81,7 +84,8 @@ public class ZInputStream extends FilterInputStream {
 
   private boolean nomoreinput=false;
 
-  public int read(byte[] b, int off, int len) throws IOException {
+  @Override
+public int read(byte[] b, int off, int len) throws IOException {
     if(len==0)
       return(0);
     int err;
@@ -113,12 +117,13 @@ public class ZInputStream extends FilterInputStream {
     return(len-z.avail_out);
   }
 
-  public long skip(long n) throws IOException {
+  @Override
+public long skip(long n) throws IOException {
     int len=512;
     if(n<len)
       len=(int)n;
     byte[] tmp=new byte[len];
-    return((long)read(tmp));
+    return(read(tmp));
   }
 
   public int getFlushMode() {
@@ -143,7 +148,8 @@ public class ZInputStream extends FilterInputStream {
     return z.total_out;
   }
 
-  public void close() throws IOException{
+  @Override
+public void close() throws IOException{
     in.close();
   }
 }

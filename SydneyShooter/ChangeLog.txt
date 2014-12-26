@@ -25,6 +25,7 @@ Small reformatting of Performance Options menu, including show stats option
 Flamethrower napalm sticks to walls
 Rockets explode into shrapnel
 Powerup added: GodlyArmor, which grants invincibility for 15 seconds (can't use more than one powerup at once)
+Tranquilizer stop people from firing for a short time, rebalanced Tranquilizer gun
 ============== UI/ HUD
 Limits on zoom in/ zoom out
 
@@ -32,7 +33,7 @@ Limits on zoom in/ zoom out
 =============== Bugfixes
 Tranquilized bots now can resume firing later
 Bots are now able to use godly armor and invisibility
-Bots have secondary armament, better rocket launcher AI
+Bots have secondary armament (pistol), better rocket launcher AI
 Bots have basic chat
 =============== Gameplay
 SpeedShoes item added
@@ -41,72 +42,55 @@ Removed item labels, so must run into them to find out what they are!
 =============== UI/HUD
 Updated Help Menu
 
+12/24/2014
+=============== Bugfixes
+Networking now works on local LAN, but slight lag for all client players on laptops, but not on desktops
+Update code to use Apache Mina 2.0.9 instead of 1.1.5;
+Organized imports, removing unnecessary references
+=============== Gameplay
+Added cheats:
+give me speed
+give me allguns
+give me cloak
+give me stealth
+=============== Graphics/UI
+Bullet trail on pistol, machinegun, rocket
+
+12/25/2014
+=============== Gameplay
+Players can slide along walls & banks of water now
+Can now aim the range of flamethrower and rocket launcher based on mouse
+Added homing missile gun
+=============== UI/HUD
+implemented translucent Arc heads-up-display of ammo in clip
+=============== Misc.
+better console output for debugging, tracing
+
+12/26/2014
+=============== Misc.
+Reorganized files
+=============== Gameplay
+Added Nailgun
+
 
 TODO:
+Fix internet gameplay, make networking more dependable
 
-FIX NETWORKING!!!
-Tranquilizer must prevent people from firing!!!
 Achievements??? - 1st kill, 3rd, 10th, 20th, 30th, 50th, 75th, 100th, 150th, 300th, 500th kills
 Die 1 time, Die 3 times with no kills, Get 3 healthpacks, Get 3 invisibilities, Switch weapons 20 times, used each weapon at least once, killed with each weapon at least once, assist 25 times
-Requires location of mouse for flamethrower aiming, rocket aiming, homing rocket
+
 Make alerts configurable
-Add homing missiles
-Be able to slide on walls, instead of stopping
-Enhance HUD/ graphics
+
+Enhance graphics
 
 Mech Suits support?
 Destructable walls- possibly by using subtractive polygons
 Map Editor/Maker!
 
-*** note: player with godly armor still can be stunned (this is intentional!)
-*** note: speedshoes can be used with either of the other powerups
-
-
-
-------------------------------------------------------------------------------------------
-== this doesn't affect anything anyway, no point trying to fix it
-java.util.prefs.WindowsPreferences <init> 
-WARNING: Could not open/create prefs root node Software\JavaSoft\Prefs 
-at root 0x80000002. Windows RegCreateKeyEx(...) returned error code 5.
-
-Cause:
-The error occurs because java.util.prefs.WindowsPreferences is trying to save information in HKEY_LOCAL_MACHINE\Software\JavaSoft\Prefs instead of under HKEY_CURRENT_USER\Software\JavaSoft\Prefs.
-Environment
-Windows 7 64-bit
-Resolving the problem
-The work around is to login as the administrator and create the key HKEY_LOCAL_MACHINE\Software\JavaSoft\Prefs. 
----------------------------------------------------------------------------------------------
-== is this caused by me not starting up a central server before I open up client?
-ByteClientMina: sessionOpened!!!!!!!!!!!!!!!!!!
-SSObjectOutputStream: stream sync'ed
-SSObjectInputStream: stream sync'ed
-GameFrame: about to try to recieve newClientVMCode
-GameFrame: recieved newClientVMCode == 1
-GameFrame: sending player, which == Player_sese_280577
-GameFrame: sent player
-GameFrame: calculating server clock diff
-GameFrame: finished calculating server clock diff, nexus.getLatencyCalculator().getServerClockDiffNanos() == -449565987411361, nexus.getLatencyCalculator().getLatencyToServerNanos() == 9743554
-GameFrame: about to try to recieve first world!
-GameFrame: returning from doJoin method after not receiving a response from the server. Thread.dumpStack(): 
-ClientController: waitForPauseMutex.notifyAll();
-ClientController: pauseMutex.notifyAll();
-java.lang.Exception: Stack trace
-	at java.lang.Thread.dumpStack(Thread.java:1329)
-	at sydneyengine.shooter.GameFrame.doJoinGame(GameFrame.java:482)
-	at sydneyengine.shooter.GameFrame.doJoinGame(GameFrame.java:272)
-	at sydneyengine.ui.JoinPane$4.run(JoinPane.java:160)
-	at java.lang.Thread.run(Thread.java:745)
-ClientController: closing
-ClientController: waitForPauseMutex.notifyAll();
-ClientController: pauseMutex.notifyAll();
-Exception in thread "Thread-8" java.lang.NullPointerException
-	at sydneyengine.shooter.Player.nexusClosing(Player.java:930)
-	at sydneyengine.Nexus.close(Nexus.java:114)
-	at sydneyengine.ClientController.close(ClientController.java:137)
-	at sydneyengine.Controller.closeAndWait(Controller.java:128)
-	at sydneyengine.shooter.GameFrame.doJoinGame(GameFrame.java:483)
-	at sydneyengine.shooter.GameFrame.doJoinGame(GameFrame.java:272)
-	at sydneyengine.ui.JoinPane$4.run(JoinPane.java:160)
-	at java.lang.Thread.run(Thread.java:745)
-
+======= when adding a new Gun:
+1. Make new gun, and bullet class
+2. Update the statement in Player class of what killed description should be
+3. Update all the itemSpawners in gameworld class to spawn it
+4. Update bots to spawn it when respawning
+5. Add help menu info
 

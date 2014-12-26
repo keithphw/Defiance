@@ -4,10 +4,13 @@
  */
 package sydneyengine.lobby;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *
@@ -37,6 +40,7 @@ public class HostedGame extends SSAdapter{
 		return numPlayers;
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{		// this is the method that you over-ride if you want custom serialization
 		out.writeFields(this);
 		// write the inetSocketAddress:
@@ -50,6 +54,7 @@ public class HostedGame extends SSAdapter{
 			out.writeInt(inetSocketAddress.getPort());
 		}
 	}
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException{	// this is the method that you over-ride if you want custom serialization
 		in.readFields(this);
 		// read the inetSocketAddress:

@@ -5,8 +5,20 @@
 
 package sydneyengine.shooter;
 
-import java.util.*;
-import java.awt.geom.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+import sydneyengine.shooter.Gun.FlameThrower;
+import sydneyengine.shooter.Gun.Gun;
+import sydneyengine.shooter.Gun.HomingGun;
+import sydneyengine.shooter.Gun.MachineGun;
+import sydneyengine.shooter.Gun.NailGun;
+import sydneyengine.shooter.Gun.Pistol;
+import sydneyengine.shooter.Gun.RocketLauncher;
+import sydneyengine.shooter.Gun.ShotGun;
+import sydneyengine.shooter.Gun.SniperRifle;
+import sydneyengine.shooter.Gun.TranquilizerGun;
 
 /**
  *
@@ -17,6 +29,11 @@ public class Bot extends Player{
 	final static int SOUTH_TEAM = 2;
 	int pathNum;
 	int pathPointNum;
+	
+	boolean strafeLeft; 
+	double secondsSinceLastStrafeChange = 0;
+	double strafeShiftFreq = .7;
+	
 	static ArrayList<ArrayList<Point2D.Float>> northTeamPaths = new ArrayList<ArrayList<Point2D.Float>>();
 	static ArrayList<ArrayList<Point2D.Float>> southTeamPaths = new ArrayList<ArrayList<Point2D.Float>>();
 	static{
@@ -93,8 +110,12 @@ public class Bot extends Player{
 		super();
 		numTimeStops = 0;
 		timeStopMultiple = 0.05;
+		
+		if(world!=null)
+		this.strafeLeft = world.getRandom().nextBoolean();
 	}
 	
+	@Override
 	public void addKill(){
 		super.addKill();
 		world.incrementAndReSeedRandom();
@@ -109,6 +130,10 @@ public class Bot extends Player{
 		else if(rand<.14) s= "Has anyone gotten the " + this.getGun().getName() + " yet?";
 		else if(rand<.16) s= "Lo and Behold!";
 		else if(rand<.18) s= "Dethroned!";
+		else if(rand<.20) s= "Resistance is futile";
+		else if(rand<.22) s= "Bring it on";
+		else if(rand<.24) s= ":P";
+		else if(rand<.26) s= "Terminator unleashed";
 		
 		world.incrementAndReSeedRandom();
 		if(world.getRandom().nextDouble()<.7) s.toLowerCase();
@@ -116,6 +141,7 @@ public class Bot extends Player{
 		if(!s.equals(""))
 		world.addChatText(new ChatText(this, s, false, world.getTotalElapsedSeconds()));
 	}
+	@Override
 	public void addDeath(){
 		super.addDeath();
 		world.incrementAndReSeedRandom();
@@ -142,9 +168,12 @@ public class Bot extends Player{
 		world.addChatText(new ChatText(this, s, false, world.getTotalElapsedSeconds()));
 	}
 	
+	@Override
 	public void respawn() {
 		super.respawn();
 		world.incrementAndReSeedRandom();
+		this.strafeLeft = world.getRandom().nextBoolean();
+		
 		if (getTeam().getSpawnFlags().size() > 1){
 			world.incrementAndReSeedRandom();
 			// the middle base is captured, so no need to run over to it and can instead go straight for the capturable flag.
@@ -155,7 +184,7 @@ public class Bot extends Player{
 		}
 		pathPointNum = 0;
 		Gun botGun = null;
-		int numGuns = 5;
+		int numGuns = 8;
 		world.incrementAndReSeedRandom();
 		int randomInt = world.getRandom().nextInt(numGuns);
 		// give bots starting weapon
@@ -171,9 +200,14 @@ public class Bot extends Player{
 			botGun = new TranquilizerGun(world);
 		}else if (randomInt == 5){
 			botGun = new RocketLauncher(world);
+		}else if (randomInt == 6){
+			botGun = new HomingGun(world);
+		}else if (randomInt == 7) {
+			botGun = new NailGun(world);
 		}
 		addAndUseGun(new Pistol(world)); //all bots have secondary armanent
 		
+		if(botGun!=null)
 		addAndUseGun(botGun); //primary weapon
 		
 		
@@ -187,7 +221,11 @@ public class Bot extends Player{
 		Player closestPlayer = null;
 		double closestDist = Double.MAX_VALUE;
 		for (Player player : world.getPlayers()){
-			if (player.isDead() || (player.isInvisible() && player.getGun().isFiring() == false) || player.getTeam() == getTeam()){
+			if (player.isDead() // don't kill already dead players
+					|| (player.isInvisible() && player.getGun().isFiring() == false) // can't see = can't hit
+					|| player.getTeam() == getTeam() // no intentional friendly fire
+					|| player.isArmored()) // bots won't fire at invincible person - waste of bullets
+			{
 				continue;
 			}
 			if (Point2D.distance(player.getX(), player.getY(), getX(), getY()) < closestDist){
@@ -205,8 +243,8 @@ public class Bot extends Player{
 		return closestPlayer;
 	}
 	
-	protected boolean isPlayerShootable(Player player){
-		if (Point2D.distance(player.getX(), player.getY(), getX(), getY()) > getGun().getRangeForBotAiming()){
+	protected boolean isPlayerShootable(Player p){
+		if (Point2D.distance(p.getX(), p.getY(), getX(), getY()) > getGun().getRangeForBotAiming()){
 			return false;
 		}
 		ArrayList<Obstacle> obstacles = getWorld().getObstacles();
@@ -219,7 +257,7 @@ public class Bot extends Player{
 			Point2D.Float[] points = shape.getPoints();
 			for (int j = 0; j < points.length; j++) {
 				int jPlus = (j + 1 == points.length ? 0 : j + 1);
-				if (Line2D.Float.linesIntersect(getX(), getY(), player.getX(), player.getY(), points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
+				if (Line2D.linesIntersect(getX(), getY(), p.getX(), p.getY(), points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
 					return false;
 				}
 			}
@@ -231,6 +269,7 @@ public class Bot extends Player{
 	double timeStopMultiple;
 	int numTimeStops;
 	
+	@Override
 	public void doMove(double seconds, double timeAtStartOfMoveSeconds) {
 		assert seconds >= 0 : seconds;
 		double nextTimeStop = timeStopMultiple * numTimeStops;
@@ -280,18 +319,38 @@ public class Bot extends Player{
 				this.cycleGunsForwardBy(1, timeAtStartOfMoveSeconds);
 			}
 			Player closestEnemy = getClosestEnemy();
-			if (closestEnemy != null){
+			if (closestEnemy != null 
+					//&& this.getGun().ammoInCurrentClip > 0
+				)
+			{ //don't engage if no ammo
 				float targetForMoveX = closestEnemy.getX() - getX();
 				float targetForMoveY = closestEnemy.getY() - getY();
+				// even bots know how to move a mouse
 				this.setMouseTargetX(targetForMoveX);
 				this.setMouseTargetY(targetForMoveY);
 				this.getGun().startFiring(timeAtStartOfMoveSeconds);
 				this.setUp(false);
-			}else{
+				
+				/*
+				if(this.secondsSinceLastStrafeChange + this.strafeShiftFreq < timeAtStartOfMoveSeconds
+						//&& this.getGun().isFiring()
+					)
+				{
+					secondsSinceLastStrafeChange= timeAtStartOfMoveSeconds;
+					strafeLeft = !strafeLeft;
+					
+				}
+				if(strafeLeft) { this.setLeft(true); this.setRight(false); this.setUp(false); this.setDown(false);}
+				else { this.setLeft(false); this.setRight(true); this.setUp(false); this.setDown(false);}
+				*/
+			}
+			else
+			{
 				ArrayList<Point2D.Float> currentPath = getTeamPaths().get(pathNum);
 				Point2D.Float targetPointForMove = currentPath.get(pathPointNum);
 				boolean doNothingUntilFlagSecured = false;
-				while (targetPointForMove.distance(getX(), getY()) < minDist){
+				while (targetPointForMove.distance(getX(), getY()) < minDist)
+				{
 					pathPointNum++;
 					if (pathPointNum >= currentPath.size()){
 						pathPointNum = 0;
@@ -299,7 +358,9 @@ public class Bot extends Player{
 							world.incrementAndReSeedRandom();
 							pathNum = world.getRandom().nextInt(2) + 2;
 							currentPath = getTeamPaths().get(pathNum);
-						}else if (pathNum == 2 || pathNum == 3){
+						}
+						else if (pathNum == 2 || pathNum == 3)
+						{
 							world.incrementAndReSeedRandom();
 							pathNum = world.getRandom().nextInt(2)+4;
 							currentPath = getTeamPaths().get(pathNum);
@@ -308,11 +369,15 @@ public class Bot extends Player{
 					targetPointForMove = currentPath.get(pathPointNum);
 				}
 				if (getWorld().getSecurableFlag().getTeam() != this.getTeam() && 
-						Point2D.distance(getWorld().getSecurableFlag().getX(), getWorld().getSecurableFlag().getY(), getX(), getY()) < getWorld().getSecurableFlag().radius){
-					// the bot is at the middle capturable flag, but its team hasn't captured it yet, so bot should wait until the base is secured.
+						Point2D.distance(getWorld().getSecurableFlag().getX(), getWorld().getSecurableFlag().getY(), getX(), getY()) <
+						getWorld().getSecurableFlag().radius)
+				{
+					// the bot is at the middle capturable base, but its team hasn't captured it yet, so bot should wait until the base is secured.
 					this.setUp(false);
 					this.getGun().stopFiring();
-				}else{
+				}
+				else
+				{
 					float targetForMoveX = targetPointForMove.x - getX();
 					float targetForMoveY = targetPointForMove.y - getY();
 					this.setMouseTargetX(targetForMoveX);
@@ -333,13 +398,15 @@ public class Bot extends Player{
 	
 	
 	// bots special move method based on direction facing, overriding the player move methods
+	@Override
 	public void doMoveOfTurretAndBody(double seconds, double timeAtStartOfMoveSeconds) {
 		assert Double.isNaN(x) == false;
 		assert seconds >= 0 : seconds;
 
 		super.PowerupCountdown(timeAtStartOfMoveSeconds);
 		super.updateTurning(seconds);
-		getGun().rotateTurret(seconds, timeAtStartOfMoveSeconds);
+		
+		//getGun().rotateTurret(seconds, timeAtStartOfMoveSeconds);
 
 		oldX = x;
 		oldY = y;
@@ -349,27 +416,28 @@ public class Bot extends Player{
 		
 		
 		
-		if (dead == false) {
-			if (left == true) {
+		if (!dead) {
+			if (left) {
 				xCoordToWorkOutAngle -= 1;
 			}
-			if (right == true) {
+			if (right) {
 				xCoordToWorkOutAngle += 1;
 			}
-			if (up == true) {
+			if (up) {
 				yCoordToWorkOutAngle -= 1;
 			}
-			if (down == true) {
+			if (down) {
 				yCoordToWorkOutAngle += 1;
 			}
 		}
 		speedX = 0f;
 		speedY = 0f;
 		if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-			float dirAngle = (float) calcAngle(xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+			float dirAngle = calcAngle(xCoordToWorkOutAngle, yCoordToWorkOutAngle);
+
 			dirAngle += Math.PI / 2; // 90 degrees is added on since we want an angle of zero to face up, not to the right (which it is without adding 90 degrees)
 			
-			//---- very wacky movement original based on facing angle
+			//---- very wacky movement original based on facing angle, but very intuitive/ easy to develop AI
 			speedX = (float) Math.cos(dirAngle + getAngle()) * getCurrentSpeed();
 			speedY = (float) Math.sin(dirAngle + getAngle()) * getCurrentSpeed();
 

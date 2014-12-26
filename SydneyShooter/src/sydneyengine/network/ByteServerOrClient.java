@@ -9,7 +9,7 @@
 
 package sydneyengine.network;
 
-import java.io.*;
+import java.io.IOException;
 /**
  *
  * @author CommanderKeith
@@ -19,8 +19,8 @@ public interface ByteServerOrClient {
 
 		public void sendTCP(byte[] bytes) throws IOException;
 
-		//public void sendUDP(byte[] bytes) throws IOException;
-		//public byte[] recieveUDP() throws IOException;
+		public void sendUDP(byte[] bytes) throws IOException;
+		public byte[] recieveUDP() throws IOException;
 
 		public void close() throws IOException;
 }

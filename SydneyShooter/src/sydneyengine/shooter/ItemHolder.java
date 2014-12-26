@@ -4,11 +4,16 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sydneyengine.shooter.Item.Item;
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *
@@ -141,10 +146,12 @@ public class ItemHolder extends SSAdapter {
 		return dead;
 	}
 
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 	}

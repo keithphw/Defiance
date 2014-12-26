@@ -9,10 +9,10 @@
 
 package sydneyengine.superserializable;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -51,12 +51,12 @@ public class FieldCache {
 		
 		Field[] primitiveFieldsArray = new Field[primitiveFields.size()];
 		primitiveFields.toArray(primitiveFieldsArray);
-		Field.setAccessible(primitiveFieldsArray, true);
+		AccessibleObject.setAccessible(primitiveFieldsArray, true);
 		storedClassPrimitives.put(ssoClass, primitiveFieldsArray);
 		
 		Field[] objectFieldsArray = new Field[objectFields.size()];
 		objectFields.toArray(objectFieldsArray);
-		Field.setAccessible(objectFieldsArray, true);
+		AccessibleObject.setAccessible(objectFieldsArray, true);
 		storedClassObjects.put(ssoClass, objectFieldsArray);
 	}
 	public HashMap<Class, Field[]> getStoredClassObjects(){

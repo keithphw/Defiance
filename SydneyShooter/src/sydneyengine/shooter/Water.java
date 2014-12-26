@@ -6,11 +6,12 @@
 package sydneyengine.shooter;
 
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+import sydneyengine.superserializable.SSAdapter;
 /**
  *
  * @author CommanderKeith

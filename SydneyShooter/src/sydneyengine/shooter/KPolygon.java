@@ -2,11 +2,22 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.awt.geom.*;
-import java.util.*;
-import java.io.*;
-import java.awt.*;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.io.Serializable;
+
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	
@@ -19,6 +30,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	
 	// The following methods are needed to implement java.awt.geom.Shape.
 	// Note that they are not implemented efficiently.
+	@Override
 	public boolean intersects(double x, double y, double w, double h){
 		Point2D.Float[] somePoints = {new Point2D.Float((float)x,(float)y),
 		new Point2D.Float((float)(x+w),(float)y),
@@ -27,9 +39,11 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		KPolygon rect = new KPolygon(somePoints);
 		return rect.intersects(this);
 	}
+	@Override
 	public boolean intersects(Rectangle2D r){
 		return this.intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	}
+	@Override
 	public boolean contains(double x, double y, double w, double h){
 		Point2D.Float[] somePoints = {new Point2D.Float((float)x,(float)y),
 		new Point2D.Float((float)(x+w),(float)y),
@@ -38,12 +52,15 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		KPolygon rect = new KPolygon(somePoints);
 		return rect.contains(this);
 	}
+	@Override
 	public boolean contains(Rectangle2D r){
 		return this.contains(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	}
+	@Override
 	public PathIterator getPathIterator(AffineTransform at){
 		return new KPolygonIterator(this, at);
 	}
+	@Override
 	public PathIterator getPathIterator(AffineTransform at, double flatness){
 		return new KPolygonIterator(this, at);
 	}
@@ -64,16 +81,19 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			this.affine = at;
 		}
 		
+		@Override
 		public int getWindingRule() {
-			return GeneralPath.WIND_EVEN_ODD;
+			return Path2D.WIND_EVEN_ODD;
 		}
 		
+		@Override
 		public boolean isDone() {
 			return (pointNum > kPolygon.points.length);
 			// done when pointNum == points.length since all points are given in
 			// currentSegment() then SEG_CLOSE must be given.
 		}
 		
+		@Override
 		public void next() {
 			// curentSegment() is called first then next(), etc
 			if (pointNum == kPolygon.points.length-1){
@@ -84,6 +104,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			pointNum++;
 		}
 		
+		@Override
 		public int currentSegment(float[] coords){
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
@@ -99,6 +120,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			return type;
 		}
 		
+		@Override
 		public int currentSegment(double[] coords){
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
@@ -201,6 +223,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	
 	/***************************************************************************************/
 	
+	@Override
 	public Rectangle2D.Float getBounds2D()	// returns upside down rectangle (reversed y-axis), (corner is in bottom left)
 	{
 		Point2D.Float[] bounds = new Point2D.Float[2];
@@ -223,6 +246,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			bounds[1].y - bounds[0].y);
 	}
 	
+	@Override
 	public Rectangle getBounds(){
 		Point[] bounds = new Point[2];
 		bounds[0] = new Point(Math.round(points[0].x), Math.round(points[0].y));
@@ -287,11 +311,13 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		}
 		return true;
 	}
+	@Override
 	public boolean contains(double x, double y){
 		//int cross = pointCrossings(x, y);	//Curve.crossingsForPath(getPathIterator(null), x, y);
 		//return ((cross & 1) != 0);
 		return contains((float)x, (float)y);//getGeneralPath().contains(x, y);
 	}
+	@Override
 	public boolean contains(Point2D point){
 		return contains(point.getX(), point.getY());
 	}
@@ -325,7 +351,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			int nextI = (i+1 >= points.length ? 0 : i+1);
 			for (int j = 0; j < foreign.points.length; j++){
 				int nextJ = (j+1 >= foreign.points.length ? 0 : j+1);
-				if (Line2D.Float.linesIntersect(points[i].x, points[i].y, points[nextI].x, points[nextI].y, foreign.points[j].x, foreign.points[j].y, foreign.points[nextJ].x, foreign.points[nextJ].y)){
+				if (Line2D.linesIntersect(points[i].x, points[i].y, points[nextI].x, points[nextI].y, foreign.points[j].x, foreign.points[j].y, foreign.points[nextJ].x, foreign.points[nextJ].y)){
 					return true;
 				}
 			}
@@ -374,7 +400,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	/***************************************************************************************/
 	
 	public boolean intersectsLine(float x1, float y1, float x2, float y2){
-		if (Point2D.Float.distance(x2,y2,centre.x,centre.y) > circularBound){
+		if (Point2D.distance(x2,y2,centre.x,centre.y) > circularBound){
 			return false;
 		}
 		for (int i = 0; i < points.length-1; i++){
@@ -503,7 +529,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		angle = (float)(Math.atan(y/x) + (x < 0 ? Math.PI : 0));
 		
 		if (angle < 0) {
-			angle += (float)2*Math.PI;
+			angle += 2*Math.PI;
 		}
 		return angle;
 	}
@@ -549,7 +575,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		angle = (float)(Math.atan(y/x) + (x < 0 ? Math.PI : 0));
 		
 		if (angle < 0) {
-			angle += (float)2*Math.PI;
+			angle += 2*Math.PI;
 		}
 		return angle;
 	}
@@ -582,11 +608,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	}
 	public static float findSignedAngleRelativeToLine(Point2D.Float subjectPoint, Point2D.Float p1, Point2D.Float p2){
 		return findSignedAngleRelativeToLine(subjectPoint.x, subjectPoint.y, p1.x, p1.y, p2.x, p2.y);
-	/*float relativeAngle = findAngleRelativeToLine(subjectPoint, p1, p2);
-	if (relativeAngle > Math.PI){
-		relativeAngle = (float)(-1*(2*Math.PI - relativeAngle));
-	}
-	return relativeAngle;*/
+
 	}
 	
 	/***************************************************************************************/
@@ -627,8 +649,8 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	public Point2D.Float findTriangleCentre(int i, Point2D.Float[] decreasingPoints) {
 		int h = (i + 1 > decreasingPoints.length-1 ? 0 : i+1);
 		int j = (i - 1 < 0 ? decreasingPoints.length-1 : i-1);
-		float x = (float)((decreasingPoints[h].x + decreasingPoints[i].x + decreasingPoints[j].x)/3);
-		float y = (float)((decreasingPoints[h].y + decreasingPoints[i].y + decreasingPoints[j].y)/3);
+		float x = (decreasingPoints[h].x + decreasingPoints[i].x + decreasingPoints[j].x)/3;
+		float y = (decreasingPoints[h].y + decreasingPoints[i].y + decreasingPoints[j].y)/3;
 		return new Point2D.Float(x, y);
 	}
 	
@@ -640,7 +662,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		float distA = (float)Math.sqrt(Math.pow(decreasingPoints[h].y - decreasingPoints[j].y, 2) + Math.pow(decreasingPoints[h].x - decreasingPoints[j].x, 2));
 		float distB = (float)Math.sqrt(Math.pow(decreasingPoints[i].y - decreasingPoints[h].y, 2) + Math.pow(decreasingPoints[i].x - decreasingPoints[h].x, 2));
 		float distC = (float)Math.sqrt(Math.pow(decreasingPoints[j].y - decreasingPoints[i].y, 2) + Math.pow(decreasingPoints[j].x - decreasingPoints[i].x, 2));
-		float s = (float)((distA + distB + distC)/2);
+		float s = (distA + distB + distC)/2;
 		return (float)Math.sqrt(Math.abs(s*(s - distA)*(s - distB)*(s - distC)));
 	}
 	
@@ -650,15 +672,15 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		float distA = (float)Math.sqrt(Math.pow(y2 - y3, 2) + Math.pow(x2 - x3, 2));
 		float distB = (float)Math.sqrt(Math.pow(y1 - y2, 2) + Math.pow(x1 - x2, 2));
 		float distC = (float)Math.sqrt(Math.pow(y3 - y1, 2) + Math.pow(x3 - x1, 2));
-		float s = (float)((distA + distB + distC)/2);
+		float s = (distA + distB + distC)/2;
 		return (float)Math.sqrt(s*(s - distA)*(s - distB)*(s - distC));
 	}
 	
 	/***************************************************************************************/
 	
 	public static Point2D.Float findTriangleCentre(float x1, float y1, float x2, float y2, float x3, float y3) {
-		float x = (float)((x1 + x2 + x3)/3);
-		float y = (float)((y1 + y2 + y3)/3);
+		float x = (x1 + x2 + x3)/3;
+		float y = (y1 + y2 + y3)/3;
 		return new Point2D.Float(x, y);
 	}
 	
@@ -865,8 +887,8 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 				// use Heron's formula to find area of the triangle and add it to the total.
 				currentTriangleArea = findTriangleArea(i, decreasingPoints);
 				currentTriangleCentre = findTriangleCentre(i, decreasingPoints);
-				incompleteCentre.x += (float)(currentTriangleCentre.x*currentTriangleArea);
-				incompleteCentre.y += (float)(currentTriangleCentre.y*currentTriangleArea);
+				incompleteCentre.x += currentTriangleCentre.x*currentTriangleArea;
+				incompleteCentre.y += currentTriangleCentre.y*currentTriangleArea;
 				totalArea += currentTriangleArea;
 				
 				// make a new array that excludes the point 'i'.
@@ -888,16 +910,16 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			// we now have only one triangle left.
 			currentTriangleArea = findTriangleArea(0, decreasingPoints);
 			currentTriangleCentre = findTriangleCentre(0, decreasingPoints);
-			incompleteCentre.x += (float)(currentTriangleCentre.x*currentTriangleArea);
-			incompleteCentre.y += (float)(currentTriangleCentre.y*currentTriangleArea);
+			incompleteCentre.x += currentTriangleCentre.x*currentTriangleArea;
+			incompleteCentre.y += currentTriangleCentre.y*currentTriangleArea;
 			totalArea += currentTriangleArea;
 			if (totalArea != 0.0f) {
-				incompleteCentre.x = (float)(incompleteCentre.x/totalArea);
-				incompleteCentre.y = (float)(incompleteCentre.y/totalArea);
+				incompleteCentre.x = incompleteCentre.x/totalArea;
+				incompleteCentre.y = incompleteCentre.y/totalArea;
 				centre = incompleteCentre;
 			} else if (decreasingPoints.length == 2) {
-				centre = new Point2D.Float((float)((decreasingPoints[0].x + decreasingPoints[1].x)/2),
-					(float)((decreasingPoints[0].y + decreasingPoints[1].y)/2));
+				centre = new Point2D.Float((decreasingPoints[0].x + decreasingPoints[1].x)/2,
+					(decreasingPoints[0].y + decreasingPoints[1].y)/2);
 			} else if (decreasingPoints.length == 1) {
 				centre = new Point2D.Float(decreasingPoints[0].x, decreasingPoints[0].y);
 			} else {
@@ -969,7 +991,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 //	    System.out.println("too high");
 								continue;
 							}
-							testLine = new Line2D.Float((float)((x1+x2)/2), (float)((y1+y2)/2), (float)((x1+x2)/2), (float)((y3+y4)/2));
+							testLine = new Line2D.Float((x1+x2)/2, (y1+y2)/2, (x1+x2)/2, (y3+y4)/2);
 							for (int k = 0; k < points.length; k++) {
 								if (k == i ||
 									k == j) {
@@ -984,10 +1006,10 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 							area1 = findTriangleArea(x1, y1, x2, y2, x1, y4);
 							area2 = findTriangleArea(x1, y4, x2, y3, x2, y2); // can do this more quickly using height formula.
 							totalArea += area1 + area2;
-							cogx += (float)(((x1 + x2 + x1)/3)*area1);
-							cogx += (float)(((x1 + x2 + x2)/3)*area2);
-							cogy += (float)(((y1 + y2 + y4)/3)*area1);
-							cogy += (float)(((y4 + y3 + y2)/3)*area2);
+							cogx += ((x1 + x2 + x1)/3)*area1;
+							cogx += ((x1 + x2 + x2)/3)*area2;
+							cogy += ((y1 + y2 + y4)/3)*area1;
+							cogy += ((y4 + y3 + y2)/3)*area2;
 //	   System.out.println("x1 = " + x1 + " y1 = " + y1 + " x2 = " + x2 + " y2 = " + y2 + " y3 = " + y3 + " y4 = " + y4);
 							break JLoop;
 						}
@@ -1011,10 +1033,10 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	public float findAreaQuickly() {
 		float totalArea = 0;
 		for (int i = 0; i < points.length - 1; i++) {
-			totalArea += (float)((points[i].x - points[i+1].x)*(points[i+1].y + (points[i].y - points[i+1].y)/2));
+			totalArea += (points[i].x - points[i+1].x)*(points[i+1].y + (points[i].y - points[i+1].y)/2);
 		}
 		// need to do points[point.length-1] and points[0].
-		totalArea += (float)((points[points.length-1].x - points[0].x)*(points[0].y + (points[points.length-1].y - points[0].y)/2));
+		totalArea += (points[points.length-1].x - points[0].x)*(points[0].y + (points[points.length-1].y - points[0].y)/2);
 		return totalArea;
 	}
 	
@@ -1069,16 +1091,16 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		if ((m1 == m2) && (m1*(lineB.x1 - lineA.x1) + lineA.y1 - lineB.y1 == 0)) {
 			System.out.println("uh oh 2");
 			if (lineA.x1 == lineB.x1 || lineA.x1 == lineB.x2) {
-				return new Point2D.Float(lineA.x1, (float)(m1*(lineA.x1 - lineA.x1) + lineA.y1));
+				return new Point2D.Float(lineA.x1, m1*(lineA.x1 - lineA.x1) + lineA.y1);
 			} else if (lineA.x2 == lineB.x1 || lineA.x2 == lineB.x2) {
-				return new Point2D.Float(lineA.x2, (float)(m1*(lineA.x2 - lineA.x1) + lineA.y1));
+				return new Point2D.Float(lineA.x2, m1*(lineA.x2 - lineA.x1) + lineA.y1);
 			}
 			System.out.println("null 5");
 			return null;		// there is an interval of intersection
 		}
 		
-		float x = (float)((m1*lineA.x1 - m2*lineB.x1 - lineA.y1 + lineB.y1)/(m1 - m2));
-		float y = (float)(m1*(x - lineA.x1) + lineA.y1);
+		float x = (m1*lineA.x1 - m2*lineB.x1 - lineA.y1 + lineB.y1)/(m1 - m2);
+		float y = m1*(x - lineA.x1) + lineA.y1;
 		//System.out.println("lineA.y1 = " + lineA.y1 + " lineB.y2 = " + lineB.y2 + " y = " + y + " m1 = " + m1 + " m2 = " + m2);
 		
 		// System.out.println("x = " + x);
@@ -1209,14 +1231,14 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	// finds the smallest circularBound and the new centre of the given centres and circularBounds.
 	// returns a float array, [0] & [1] are the centre X & Y coords and [2] is the circularBound.
 	public static float[] findCombinedCentreAndCircularBound(float x1, float y1, float circularBound1, float x2, float y2, float circularBound2){
-		float dist = (float)Point2D.Float.distance(x1, y1, x2, y2);
-		float newCircularBound = (float)((circularBound1 + dist + circularBound2)/2);
+		float dist = (float)Point2D.distance(x1, y1, x2, y2);
+		float newCircularBound = (circularBound1 + dist + circularBound2)/2;
 		float x = x2 - x1;
 		float y = y2 - y1;
 		float distFromC1ToNewC = newCircularBound - circularBound1;
 		float[] centreXYAndBound = new float[3];
-		centreXYAndBound[0] = (float)(distFromC1ToNewC*x/dist);
-		centreXYAndBound[1] = (float)(distFromC1ToNewC*y/dist);
+		centreXYAndBound[0] = distFromC1ToNewC*x/dist;
+		centreXYAndBound[1] = distFromC1ToNewC*y/dist;
 		centreXYAndBound[2] = newCircularBound;
 		
 		return centreXYAndBound;
@@ -1267,6 +1289,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	
 	/***************************************************************************************/
 	
+	@Override
 	public String toString() {
 		/*StringBuffer kPolygonString = new StringBuffer("[KPolygon] number of points = " + points.length + "\n" +
 			"area = " + area + "\n" +
@@ -1282,7 +1305,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	/***************************************************************************************/
 	
 	public GeneralPath getGeneralPath() {
-		GeneralPath generalPath = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+		GeneralPath generalPath = new GeneralPath(Path2D.WIND_EVEN_ODD);
 		generalPath.moveTo(points[0].x, points[0].y);
 		for (int i = 1; i < points.length; i++) {
 			generalPath.lineTo(points[i].x, points[i].y);
@@ -1313,7 +1336,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 	/***************************************************************************************/
 	
 	public static Point2D.Float getMidPoint(Point2D.Float p1, Point2D.Float p2){
-		return new Point2D.Float((float)((p1.x + p2.x)/2), (float)((p1.y + p2.y)/2));
+		return new Point2D.Float((p1.x + p2.x)/2, (p1.y + p2.y)/2);
 	}
 	
 	/***************************************************************************************/
@@ -1380,6 +1403,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 		}
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{
 		out.writeFloat(area);
 		out.writeFloat(circularBound);
@@ -1396,6 +1420,7 @@ public final class KPolygon  extends SSAdapter implements Serializable, Shape{
 			out.writeFloat(centre.y);
 		}
 	}
+	@Override
 	public void readSS(SSObjectInputStream in) throws IOException{
 		area = in.readFloat();
 		circularBound = in.readFloat();

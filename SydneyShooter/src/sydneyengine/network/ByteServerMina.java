@@ -1,14 +1,10 @@
 package sydneyengine.network;
 
-import org.apache.mina.transport.socket.nio.*;
-import org.apache.mina.common.*;
-import org.apache.mina.filter.*;
-import org.apache.mina.filter.codec.*;
-import org.apache.mina.filter.codec.textline.*;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
 
 public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 
@@ -21,6 +17,7 @@ public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 		receivedBytes = new ArrayList<byte[]>();
 	}
 	
+	@Override
 	public void sendTCP(byte[] bytes) throws IOException {
 		if (refToIoSession.isConnected() == false){
 			throw new IOException("IoSession closed!");
@@ -29,6 +26,7 @@ public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 		this.refToIoSession.write(bytes);
 	}
 
+	@Override
 	public byte[] recieveTCP() throws IOException {
 		if (refToIoSession.isConnected() == false){
 			throw new IOException("IoSession closed!");
@@ -41,22 +39,26 @@ public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 		return null;
 	}
 
+	@Override
 	public void close() throws IOException {
 		System.out.println(this.getClass().getSimpleName() + ": closing 1");
 		if (refToIoSession != null) {
-			refToIoSession.close();
+			refToIoSession.close(true);
 		}
 		System.out.println(this.getClass().getSimpleName() + ": closing 2");
 	}
 	
+	@Override
 	public void sessionCreated(IoSession session) throws Exception {
 		super.sessionCreated(session);
     }
 
-    public void sessionOpened(IoSession session) throws Exception {
-		System.out.println(this.getClass().getSimpleName()+": sessionOpened!!!!!!!!!!!!!!!!!!");
+    @Override
+	public void sessionOpened(IoSession session) throws Exception {
+		System.out.println(this.getClass().getSimpleName()+": sessionOpened!");
 	}
 
+	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		synchronized (receivedBytesMutex) {
 			receivedBytes.add((byte[])message);
@@ -64,19 +66,21 @@ public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 		}
 	}
 	
+	@Override
 	public void sessionClosed(IoSession session) throws Exception {
-		session.close();
+		session.close(true);
 		try{
 			close();
 		}catch(IOException e){e.printStackTrace();}
 	}
 	
+	@Override
 	public void exceptionCaught(IoSession session, Throwable cause) {
 		//SessionLog.error(session, "", cause);
 		// Close connection when unexpected exception is caught.
 		cause.printStackTrace();
 		//exceptionThrown = cause;
-		session.close();
+		session.close(true);
 		try{
 			close();
 		}catch(IOException e){e.printStackTrace();}
@@ -88,5 +92,17 @@ public class ByteServerMina  extends IoHandlerAdapter implements ByteServer{
 	 */
 	public IoSession getRefToIoSession() {
 		return refToIoSession;
+	}
+
+	@Override
+	public void sendUDP(byte[] bytes) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public byte[] recieveUDP() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

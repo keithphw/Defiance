@@ -5,8 +5,8 @@
 
 package sydneyengine;
 
-import sydneyengine.shooter.Player;
 import sydneyengine.shooter.GameFrame;
+import sydneyengine.shooter.Player;
 import sydneyengine.shooter.ViewPane;
 
 /**

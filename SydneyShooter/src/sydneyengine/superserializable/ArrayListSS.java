@@ -1,8 +1,8 @@
 package sydneyengine.superserializable;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 
@@ -18,14 +18,17 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 		SSCodeAllocator.assignNextObjectCode(this);
 	}
 
+	@Override
 	public int getSSCode() {
 		return code;
 	}
 
+	@Override
 	public void setSSCode(int code) {
 		this.code = code;
 	}
 
+	@Override
 	public void collectMemberSSObjects(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> ssObjects, HashMap<Object, Object> nonSSObjects) {
 		for (E element : this) {
 			if (element != null) {
@@ -94,6 +97,7 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 	}
 	}
 	}*/
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {
 		out.writeInt(code);
 		out.writeInt(size());
@@ -113,6 +117,7 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 		}
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws IOException {
 		code = in.readInt();
 		int numElements = in.readInt();
@@ -163,10 +168,12 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 	//encode = SSTools.assignNextObjectCode();
 	}
 
+	@Override
 	public SSObject deepClone(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects) {
 		return deepClone(fieldCache, alreadyProcessedObjects, null);
 	}
 
+	@Override
 	public ArrayListSS deepClone(FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference) {
 		ArrayListSS clone = (ArrayListSS) alreadyProcessedObjects.modifiedGet(this.getSSCode());
 		if (clone != null) {
@@ -210,10 +217,12 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 		return ok;
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects) {
 		makeEqualTo(model, fieldCache, alreadyProcessedObjects, null);
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference) {
 		WeakSSObjectMap<SSObject, Object> thisObjectsSSObjects = new WeakSSObjectMap<SSObject, Object>();
 		HashMap<Object, Object> thisObjectsNonSSObjects = new HashMap<Object, Object>();
@@ -221,11 +230,12 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 		makeEqualTo(model, fieldCache, alreadyProcessedObjects, memberObjectsToCopyByReference, thisObjectsSSObjects, thisObjectsNonSSObjects);
 	}
 
+	@Override
 	public void makeEqualTo(SSObject model, FieldCache fieldCache, WeakSSObjectMap<SSObject, Object> alreadyProcessedObjects, ArrayList<Object> memberObjectsToCopyByReference, WeakSSObjectMap<SSObject, Object> thisObjectsSSObjects, HashMap<Object, Object> thisObjectsNonSSObjects) {
 		//this.setSSCode(model.getSSCode());
 		SSCodeAllocator.setSSCodeForObject(this, model.getSSCode());
 
-		SSObject thisObject = (SSObject) alreadyProcessedObjects.modifiedGet(this.getSSCode());
+		SSObject thisObject = alreadyProcessedObjects.modifiedGet(this.getSSCode());
 		if (thisObject != null) {
 			// Since this object is already in alreadyProcessedObjects then it must have already had
 			// makeEqualTo called on it.
@@ -247,21 +257,21 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 				this.addReplace(j, modelList.get(j));
 			} else if (modelList.get(j) instanceof SSObject) {
 				SSObject ssModelListElement = (SSObject) modelList.get(j);
-				SSObject toBeMadeEqualToMemberOfThis = (SSObject) alreadyProcessedObjects.modifiedGet(ssModelListElement.getSSCode());
+				SSObject toBeMadeEqualToMemberOfThis = alreadyProcessedObjects.modifiedGet(ssModelListElement.getSSCode());
 				if (toBeMadeEqualToMemberOfThis == null) {
 					if (size() > j && get(j) instanceof SSObject && ssModelListElement.getSSCode() == ((SSObject) get(j)).getSSCode()) {
 						SSObject ssThisListElement = (SSObject) get(j);
 						ssThisListElement.makeEqualTo(ssModelListElement, fieldCache, alreadyProcessedObjects, memberObjectsToCopyByReference, thisObjectsSSObjects, thisObjectsNonSSObjects);
 						continue;
 					}
-					toBeMadeEqualToMemberOfThis = (SSObject) thisObjectsSSObjects.modifiedGet(ssModelListElement.getSSCode());//((SSObject)memberOfModel).deepClone(fieldCache, alreadyProcessedObjects, memberObjectsToCopyByReference);
+					toBeMadeEqualToMemberOfThis = thisObjectsSSObjects.modifiedGet(ssModelListElement.getSSCode());//((SSObject)memberOfModel).deepClone(fieldCache, alreadyProcessedObjects, memberObjectsToCopyByReference);
 					if (toBeMadeEqualToMemberOfThis == null) {
 						// Need to clone it the ssMemberOfModel.
 						// Note that deepClone isn't the way to go because we don't necessarily 
 						// want to deepClone all of ssMemberOfModel's fields.
 						//System.err.println(this.getClass().getSimpleName() + ".makeEqualTo(...): doing clone of ssModelListElement == " + ssModelListElement);
 						try {
-							toBeMadeEqualToMemberOfThis = (SSObject) ssModelListElement.shallowCloneForMakeEqualTo(fieldCache);
+							toBeMadeEqualToMemberOfThis = ssModelListElement.shallowCloneForMakeEqualTo(fieldCache);
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
@@ -283,6 +293,7 @@ public class ArrayListSS<E> extends ArrayList<E> implements SSObject {
 		assert ((ArrayListSS)model).size() == this.size();
 	}
 
+	@Override
 	public SSObject shallowCloneForMakeEqualTo(FieldCache fieldCache){
 		SSObject clone = new ArrayListSS();
 		// makeEqualTo should fill clone's object refs back in with real objects, so we'll just return an empty list.

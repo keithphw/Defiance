@@ -8,10 +8,14 @@
  */
 package sydneyengine;
 
+import java.io.IOException;
+
+import sydneyengine.network.ByteServer;
+import sydneyengine.network.ConnectionServerListener;
 import sydneyengine.shooter.Player;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
-import java.io.*;
+import sydneyengine.superserializable.SSCodeAllocator;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 // all this class does is give out ConnectionWelcomers when asked.
 public class ConnectionWelcomer implements ConnectionServerListener, GameConstants {
@@ -30,6 +34,7 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 		}
 	}
 
+	@Override
 	public void connectionMade(ByteServer byteServer) {
 		Thread t = new ConnectionCommunicator(this, servingController, byteServer);
 		t.setDaemon(true);
@@ -73,6 +78,7 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 			}
 		}
 
+		@Override
 		public void run() {
 			this.setName("ConnectionWelcomer " + getName());
 
@@ -94,7 +100,7 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 			}
 			System.out.println(this.getClass().getSimpleName() + ": sent clientVMCode");
 
-			System.out.println(this.getClass().getSimpleName() + ": about ot try to recieve the cleint's player");
+			System.out.println(this.getClass().getSimpleName() + ": about to try to recieve the client player");
 			MessagePack messagePack = null;
 			int maxMillisToLoop = 10000;	// 10 seconds
 			long timeAtStartOfLoop = System.currentTimeMillis();
@@ -110,10 +116,12 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 				} else {
 					try {
 						Thread.sleep(10);
-					} catch (InterruptedException ex) {
+					} catch (InterruptedException ex) 
+					{
 					}
 					if (System.currentTimeMillis() - timeAtStartOfLoop > maxMillisToLoop) {
-						System.err.println(this.getClass().getSimpleName() + ": returning from doJoin method after not receiving a response from the server. Thread.dumpStack(): ");
+						System.err.println(this.getClass().getSimpleName() +
+								": returning from doJoin method after not receiving a response from the server. Thread.dumpStack(): ");
 						Thread.dumpStack();
 						return;
 					}
@@ -174,7 +182,8 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 						} catch (InterruptedException ex) {
 						}
 						if (System.currentTimeMillis() - timeAtStartOfLoop > maxMillisToLoop) {
-							System.err.println(this.getClass().getSimpleName() + ": returning from doJoin method after not receiving a response from the server. Thread.dumpStack(): ");
+							System.err.println(this.getClass().getSimpleName() + 
+									": returning from doJoin method after not receiving a response from the server. Thread.dumpStack(): ");
 							Thread.dumpStack();
 							return;
 						}
@@ -196,14 +205,18 @@ public class ConnectionWelcomer implements ConnectionServerListener, GameConstan
 				e.printStackTrace();
 				return;
 			}
-			System.out.println(this.getClass().getSimpleName() + ": finished calculating server clock diff, nexus.getLatencyCalculator().getServerClockDiffNanos() == " + nexus.getLatencyCalculator().getServerClockDiffNanos() + ", nexus.getLatencyCalculator().getLatencyToServerNanos() == " + nexus.getLatencyCalculator().getLatencyToServerNanos());
+			System.out.println(this.getClass().getSimpleName() + 
+					": finished calculating server clock diff, nexus.getLatencyCalculator().getServerClockDiffNanos() == " 
+					+ nexus.getLatencyCalculator().getServerClockDiffNanos() + ", nexus.getLatencyCalculator().getLatencyToServerNanos() == " 
+					+ nexus.getLatencyCalculator().getLatencyToServerNanos());
 
 			// Once the nexus is added to the serverController, the nexus is sent the events and the world.
 			// This must be done in the controller thread because that thread modifies the world, 
 			// and we can't send the world from this thread half-way through a modification.
 			servingController.addNexus(nexus);
 
-			System.out.println(this.getClass().getSimpleName() + ": done initial setup. World will be sent to client shortly in the Controller thread.");
+			System.out.println(this.getClass().getSimpleName() + 
+					": done initial setup. World will be sent to client shortly in the Controller thread.");
 		}
 	}
 }

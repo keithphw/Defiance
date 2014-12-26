@@ -8,9 +8,10 @@
  */
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *
@@ -34,6 +35,7 @@ public class ReceiverPollingClient extends ReceiverPolling {
 		}
 	}
 
+	@Override
 	public void run() {
 		while (shouldRun) {
 			Nexus nexus = controller.getNexus();
@@ -41,7 +43,7 @@ public class ReceiverPollingClient extends ReceiverPolling {
 			assert nexus.getPlayer().getWorld() != null;
 			MessagePack messagePack = null;
 			try {
-				messagePack = (MessagePack) nexus.recieve();
+				messagePack = nexus.recieve();
 			} catch (IOException e) {
 				e.printStackTrace();
 				controller.nexusThrewException(nexus);
@@ -98,6 +100,7 @@ public class ReceiverPollingClient extends ReceiverPolling {
 		// Since the message was not to do with latency, it must be an event so return true.
 		return true;
 	}
+	@Override
 	public ClientController getController(){
 		return controller;
 	}

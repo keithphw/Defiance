@@ -5,7 +5,7 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
+import sydneyengine.superserializable.SSAdapter;
 
 /**
  *
@@ -44,6 +44,7 @@ public class ChatText extends SSAdapter implements Comparable{
 	public boolean isAlliesOnly() {
 		return alliesOnly;
 	}
+	@Override
 	public int compareTo(Object other){
 		assert other instanceof ChatText : other;
 		double thisTimeStamp = getTimeStamp();

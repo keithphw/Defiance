@@ -5,9 +5,8 @@
 
 package sydneyengine.lobby;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.SSAdapter;
 
 
 /**

@@ -1,6 +1,9 @@
 package com.grexengine.jgf;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 //import org.apache.log4j.*;
 

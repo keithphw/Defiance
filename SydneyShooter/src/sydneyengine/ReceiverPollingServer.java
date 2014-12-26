@@ -10,9 +10,11 @@
 
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 
 /**
@@ -49,6 +51,7 @@ public class ReceiverPollingServer extends ReceiverPolling {
 			ex.printStackTrace();
 		}
 	}
+	@Override
 	public void run(){
 		OuterLoop: while(shouldRun){
 			ArrayList<Nexus> copyOfNexuses = controller.getCopyOfNexuses();
@@ -59,7 +62,7 @@ public class ReceiverPollingServer extends ReceiverPolling {
 				//assert nexus.getPlayer().getWorld() != null;
 				MessagePack messagePack = null;
 				try{
-					messagePack = (MessagePack)nexus.recieve();
+					messagePack = nexus.recieve();
 				}catch(IOException e){
 					e.printStackTrace();
 					controller.nexusThrewException(nexus);
@@ -136,6 +139,7 @@ public class ReceiverPollingServer extends ReceiverPolling {
 			}
 		}
 	}
+	@Override
 	public ServingController getController(){
 		return controller;
 	}

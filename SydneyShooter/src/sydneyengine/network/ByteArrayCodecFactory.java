@@ -4,10 +4,15 @@
  */
 package sydneyengine.network;
 
-import org.apache.mina.transport.socket.nio.*;
-import org.apache.mina.common.*;
-import org.apache.mina.filter.*;
-import org.apache.mina.filter.codec.*;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolCodecFactory;
+import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
  *
@@ -23,19 +28,12 @@ public class ByteArrayCodecFactory implements ProtocolCodecFactory {
 		decoder = new ByteArrayDecoder();
 	}
 
-	public ProtocolEncoder getEncoder() throws Exception {
-		return encoder;
-	}
-
-	public ProtocolDecoder getDecoder() throws Exception {
-		return decoder;
-	}
-
 	public class ByteArrayEncoder extends ProtocolEncoderAdapter {
 
+		@Override
 		public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
 			byte[] bytes = (byte[]) message;
-			ByteBuffer buffer = ByteBuffer.allocate(bytes.length + 4, false);
+			IoBuffer buffer = IoBuffer.allocate(bytes.length + 4);
 			buffer.putInt(bytes.length);
 			buffer.put(bytes);
 			buffer.flip();
@@ -45,16 +43,32 @@ public class ByteArrayCodecFactory implements ProtocolCodecFactory {
 
 	public class ByteArrayDecoder extends CumulativeProtocolDecoder {
 
-		protected boolean doDecode(IoSession session, ByteBuffer in, ProtocolDecoderOutput out) throws Exception {
-			if (in.prefixedDataAvailable(4)) {
+		@Override
+		protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+			if (in.prefixedDataAvailable(4)) 
+			{
 				int length = in.getInt();
 				byte[] bytes = new byte[length];
 				in.get(bytes);
 				out.write(bytes);
 				return true;
-			} else {
+			} 
+			else 
+			{
 				return false;
 			}
+
+			
 		}
+	}
+
+	@Override
+	public ProtocolDecoder getDecoder(IoSession arg0) throws Exception {
+		return decoder;
+	}
+
+	@Override
+	public ProtocolEncoder getEncoder(IoSession arg0) throws Exception {
+		return encoder;
 	}
 }

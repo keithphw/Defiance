@@ -8,13 +8,13 @@
  */
 package sydneyengine;
 
-import sydneyengine.shooter.Player;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import sydneyengine.shooter.GameFrame;
-import sydneyengine.shooter.ViewPane;
 import sydneyengine.shooter.GameWorld;
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.io.*;
+import sydneyengine.shooter.Player;
+import sydneyengine.shooter.ViewPane;
 /**
  * 
  * @author CommanderKeith
@@ -39,8 +39,10 @@ public class ServerController extends ServingController implements PlayingContro
 		this.sender = sender;
 		setWorld(world);
 		fpsCounter = new FPSCounter(this);
+		System.out.println("ServerController successfully started: Running: " + this.isRunning());
 	}
 
+	@Override
 	public void run() {
 		System.out.println(this.getClass().getSimpleName() + ": starting");
 		long nanoTimeNow = MockSystem.nanoTime() + getServerClockDiffNanos();	// getServerClockDiffNanos() will always be zero, so don't really need it...
@@ -107,8 +109,8 @@ public class ServerController extends ServingController implements PlayingContro
 			long currentSystemTimeNanos = MockSystem.nanoTime() + getServerClockDiffNanos();	// get the current time
 			long actualTimeElapsedNanos = currentSystemTimeNanos - oldSystemTimeNanos;
 			this.oldSystemTimeNanos = currentSystemTimeNanos;
-			
-			// russian: 'good-night' == 'do svedanye', bye == 'poka', shut up = 'zat nis', how's it going = 'cac de la?', it is good = 'e ta harashaw'
+
+
 			long timeElapsedNanos = (currentSystemTimeNanos - (world.getSystemNanosAtStart() + world.getPureTotalElapsedNanos()));// work out the time since the last updateNanos    // russian: 'good-night' == 'do svedanye', bye == 'poka', shut up = 'zat nis', how's it going = 'cac de la?', it is good = 'e ta harashaw'
 
 			// Update the world using the time elapsed
@@ -145,6 +147,7 @@ public class ServerController extends ServingController implements PlayingContro
 		System.out.println(this.getClass().getSimpleName() + ": game loop finished 2");
 	}
 
+	@Override
 	public void close() {
 		closeConnectionListener();
 		if (getReceiver() != null) {
@@ -165,25 +168,31 @@ public class ServerController extends ServingController implements PlayingContro
 		super.close();
 	}
 	
+	@Override
 	public Player getPlayer() {
 		return player;
 	}
 
+	@Override
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
 
+	@Override
 	public ViewPane getViewPane() {
 		return viewPane;
 	}
 
+	@Override
 	public void setViewPane(ViewPane viewPane) {
 		this.viewPane = viewPane;
 	}
+	@Override
 	public GameFrame getGameFrame() {
 		return gameFrame;
 	}
 
+	@Override
 	public void setGameFrame(GameFrame gameFrame) {
 		this.gameFrame = gameFrame;
 	}

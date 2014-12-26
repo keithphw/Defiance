@@ -1,10 +1,13 @@
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+
+import sydneyengine.superserializable.SSAdapter;
 
 public class SpawnFlag extends SSAdapter{
 
@@ -50,7 +53,7 @@ public class SpawnFlag extends SSAdapter{
 				if (player.isDead() == true) {
 					continue;
 				}
-				if (Point2D.Float.distance(x, y, player.getX(), player.getY()) < player.getR() + radius){
+				if (Point2D.distance(x, y, player.getX(), player.getY()) < player.getR() + radius){
 					if (teamCurrentlyInCircle == null){
 						teamCurrentlyInCircle = player.getTeam();
 						playerOfTeamCurrentlyInFlagArea = player;

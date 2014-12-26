@@ -9,9 +9,14 @@
 
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSCodeAllocator;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  * This class is the wrapper for all AbstractEvents. If an EventWrapper is recieved 
  * over the network, its AbstractEvent would not exist yet since it would just be
@@ -70,6 +75,7 @@ public class EventWrapper extends SSAdapter implements Comparable{
 	public void setTimeStamp(double timeStamp){
 		this.timeStamp = timeStamp;
 	}
+	@Override
 	public int compareTo(Object ev){
 		assert ev instanceof EventWrapper : ev;
 		double thisTimeStamp = getTimeStamp();
@@ -100,6 +106,7 @@ public class EventWrapper extends SSAdapter implements Comparable{
 //			}
 		}
 	}
+	@Override
 	public String toString(){
 		return super.toString()+"_"+getTimeStamp()+"getSSCode"+getSSCode()+"_getSSCodeDecoded"+SSCodeAllocator.decode(getSSCode())[0]+"_id"+id+"_count"+count;
 	}
@@ -144,6 +151,7 @@ public class EventWrapper extends SSAdapter implements Comparable{
 		return underlyingEventBytes != null;
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{		// this is the method that you over-ride if you want custom serialization
 		assert underlyingEventBytes != null;
 		out.writeDouble(timeStamp);
@@ -154,6 +162,7 @@ public class EventWrapper extends SSAdapter implements Comparable{
 		out.writeInt(id);
 		out.writeInt(count);
 	}
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException{	// this is the method that you over-ride if you want custom serialization
 		// question: is this method called for each class level?? or will sub-class vars not get written?
 		// answer: no, this method will not be called at each class-level,

@@ -4,11 +4,13 @@
  */
 
 package sydneyengine.shooter;
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.io.IOException;
+
+import sydneyengine.shooter.Item.Item;
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  * Spawns a new itemHolder respawnIntervalSeconds after the old itemHolder died.
@@ -81,10 +83,12 @@ public class ItemSpawner extends SSAdapter {
 		this.y = y;
 	}
 
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 	}

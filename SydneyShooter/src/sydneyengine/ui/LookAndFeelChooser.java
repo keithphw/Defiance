@@ -5,16 +5,36 @@
 
 package sydneyengine.ui;
 
-import sydneyengine.shooter.GameFrame;
-import sydneyengine.*;
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import com.grexengine.jgf.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+
+import sydneyengine.shooter.GameFrame;
+
+import com.grexengine.jgf.ClassLocater;
 
 
 public class LookAndFeelChooser extends JDialog{
@@ -28,13 +48,13 @@ public class LookAndFeelChooser extends JDialog{
 	
 	final JDialog dialog;	//JInternalFrame dialog;
 	
-	final ArrayList list;
+	final ArrayList<LookAndFeelInfo> list;
 	
 	public LookAndFeelChooser(final GameFrame frame){
 		super(frame);
 		setTitle("Choose a New Look & Feel!");
 		this.frame = frame;
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setModal(false);
 		
 		
@@ -64,7 +84,6 @@ public class LookAndFeelChooser extends JDialog{
 		}
 		
 		if (GameFrame.isSubstanceLnFPresent()){
-		//list.add(new UIManager.LookAndFeelInfo("Lipstik", "com.LipstikLF.lipstikLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceAutumn", "org.jvnet.substance.skin.SubstanceAutumnLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceAqua", "org.jvnet.substance.SubstanceDefaultLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceBusinessBlackSteel", "org.jvnet.substance.skin.SubstanceBusinessBlackSteelLookAndFeel"));
@@ -72,10 +91,8 @@ public class LookAndFeelChooser extends JDialog{
 			list.add(new UIManager.LookAndFeelInfo("SubstanceBusiness", "org.jvnet.substance.skin.SubstanceBusinessLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceChallengerDeep", "org.jvnet.substance.skin.SubstanceChallengerDeepLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceCreme", "org.jvnet.substance.skin.SubstanceCremeLookAndFeel"));
-			//list.add(new UIManager.LookAndFeelInfo("SubstanceDesertSand", "slavebot.ui.lnf.SubstanceDesertSandLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceEmeraldDusk", "org.jvnet.substance.skin.SubstanceEmeraldDuskLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceFieldOfWheat", "org.jvnet.substance.skin.SubstanceFieldOfWheatLookAndFeel"));
-			//list.add(new UIManager.LookAndFeelInfo("SubstanceFindingNemo", "slavebot.ui.lnf.SubstanceFindingNemoLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceGreenMagic", "org.jvnet.substance.skin.SubstanceGreenMagicLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceMagma", "org.jvnet.substance.skin.SubstanceMagmaLookAndFeel"));
 			list.add(new UIManager.LookAndFeelInfo("SubstanceMango", "org.jvnet.substance.skin.SubstanceMangoLookAndFeel"));
@@ -101,17 +118,23 @@ public class LookAndFeelChooser extends JDialog{
 		
 		table = new JTable();
 		table.setModel(new AbstractTableModel() {
+			@Override
 			public String getColumnName(int col) {
 				return "Name";
 			}
+			@Override
 			public int getRowCount() { return list.size(); }
+			@Override
 			public int getColumnCount() { return 1; }
+			@Override
 			public Object getValueAt(int row, int col) {
-				return ((UIManager.LookAndFeelInfo)list.get(row)).getName();//+" " +list.get(row).getClassName();
+				return list.get(row).getName();//+" " +list.get(row).getClassName();
 			}
+			@Override
 			public boolean isCellEditable(int row, int col){
 				return false;
 			}
+			@Override
 			public void setValueAt(Object value, int row, int col) {
 			}
 		});
@@ -122,6 +145,7 @@ public class LookAndFeelChooser extends JDialog{
 		ListSelectionModel rowSM = table.getSelectionModel();
 		final LookAndFeelChooser thisLookAndFeelChooser = this;
 		rowSM.addListSelectionListener(new ListSelectionListener() {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				//Ignore extra messages.
 				if (e.getValueIsAdjusting()){
@@ -139,20 +163,23 @@ public class LookAndFeelChooser extends JDialog{
 					
 					final int selectedRow = lsm.getMinSelectionIndex();
 					Thread t = new Thread(){
+						@Override
 						public void run(){
 							try{Thread.sleep(500);}catch(Exception e){}	// do this just to allow the progress bar to animate for a while
 							SwingUtilities.invokeLater(new Runnable() {
+								@Override
 								public void run() {
 									boolean was_wm_decorated = !frame.isUndecorated();
 									
 									try {
-										UIManager.setLookAndFeel(((UIManager.LookAndFeelInfo)list.get(selectedRow)).getClassName());
+										UIManager.setLookAndFeel(list.get(selectedRow).getClassName());
 									} catch (ClassNotFoundException exc) {
 										exc.printStackTrace();//out("LAF main class '" + lafClassName + "' not found");
 									} catch (Exception exc) {
 										exc.printStackTrace();
 									}finally{
 										SwingUtilities.invokeLater(new Runnable() {
+											@Override
 											public void run() {
 												/*Window[] allFrames = frame.getWindows();
 												for (Window aWindow : allFrames){
@@ -171,7 +198,7 @@ public class LookAndFeelChooser extends JDialog{
 									boolean is_wm_decorated = !UIManager.getLookAndFeel().getSupportsWindowDecorations();
 									if (is_wm_decorated != was_wm_decorated) {
 										//out("Changing decoration policy\n");
-										Frame[] allFrames = frame.getFrames();
+										Frame[] allFrames = Frame.getFrames();
 										for (int i = 0; i < allFrames.length; i++){
 											Frame aFrame = allFrames[i];
 											if (aFrame instanceof JFrame){
@@ -269,6 +296,7 @@ public class LookAndFeelChooser extends JDialog{
 		oKButton = new JButton("OK");
 		//cancelButton = new JButton("Cancel");
 		oKButton.addActionListener(new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e){
 				setVisible(false);
 			}
@@ -280,7 +308,7 @@ public class LookAndFeelChooser extends JDialog{
 		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		//setSize((int)(screenSize.width/3), (int)(screenSize.height/2));
-		setSize((int)(300), (int)(400));
+		setSize((300), (400));
 		setLocationRelativeTo(frame);
 		oKButton.requestFocus();
 		setVisible(true);
@@ -288,12 +316,12 @@ public class LookAndFeelChooser extends JDialog{
 	
 	
 	//public static ArrayList<Class> getSortedClasses(Class clazz){
-	public static ArrayList getSortedClasses(Class clazz){
+	public static ArrayList<Class<?>> getSortedClasses(Class clazz){
 		return getSortedClasses(clazz, ".*");
 	}
 	
 	//public static ArrayList<Class> getSortedClasses(Class clazz, String regex){
-	public static ArrayList getSortedClasses(Class clazz, String regex){
+	public static ArrayList<Class<?>> getSortedClasses(Class clazz, String regex){
 		ClassLocater classLocater = new ClassLocater();
 		classLocater.addSkipPrefix("javax");
 		classLocater.addSkipPrefix("bsh");
@@ -316,7 +344,7 @@ public class LookAndFeelChooser extends JDialog{
 		//ArrayList<Class> sortedClasses = new ArrayList<Class>(classes.length);
 		ArrayList sortedClasses = new ArrayList(classes.length);
 		for (int i = 0; i < classes.length; i++){
-			Class aClazz = (Class)classes[i];
+			Class aClazz = classes[i];
 			System.out.println(aClazz.getName());
 			if (!(sortedClasses.contains(aClazz))){
 				sortedClasses.add(aClazz);

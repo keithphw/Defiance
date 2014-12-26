@@ -5,13 +5,16 @@
 
 package sydneyengine;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sydneyengine.network.ConnectionServerMina;
+import sydneyengine.shooter.GameWorld;
 import sydneyengine.shooter.Player;
 import sydneyengine.shooter.ViewPane;
-import sydneyengine.shooter.GameWorld;
-import sydneyengine.superserializable.*;
-import sydneyengine.network.*;
-import java.util.*;
-import java.io.*;
+import sydneyengine.superserializable.FieldCache;
+import sydneyengine.superserializable.SSObject;
+import sydneyengine.superserializable.WeakSSObjectMap;
 /**
  * 
  * @author CommanderKeith
@@ -31,13 +34,16 @@ public class DedicatedServerController extends ServingController implements Game
 		fpsCounter = new FPSCounter(this);
 	}
 	
+	@Override
 	public Player getPlayer(){
 		return null;
 	}
+	@Override
 	public ViewPane getViewPane(){
 		return null;
 	}
 
+	@Override
 	public void run() {
 		System.out.println(this.getClass().getSimpleName() + ": starting");
 		long nanoTimeNow = MockSystem.nanoTime() + getServerClockDiffNanos();	// getServerClockDiffNanos() will always be zero, so don't really need it...
@@ -137,6 +143,7 @@ public class DedicatedServerController extends ServingController implements Game
 		System.out.println(this.getClass().getSimpleName() + ": game loop finished 2");
 	}
 
+	@Override
 	public void close() {
 		closeConnectionListener();
 		/*if (connectionListener != null) {
@@ -168,7 +175,7 @@ public class DedicatedServerController extends ServingController implements Game
 		ConnectionServerMina connectionServer = null;
 		try {
 			connectionServer = new ConnectionServerMina();
-			connectionServer.bindAndListen(sydneyengine.shooter.GameFrame.DEFAULT_PORT_TCP);
+			connectionServer.bindAndListen(GameConstants.DEFAULT_PORT_TCP);
 		} catch (java.io.IOException ex) {
 			ex.printStackTrace();
 			java.awt.Toolkit.getDefaultToolkit().beep();

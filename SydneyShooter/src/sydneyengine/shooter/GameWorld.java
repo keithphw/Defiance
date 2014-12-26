@@ -8,24 +8,44 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import java.awt.geom.Point2D.Float;
-import java.net.*;
-import java.awt.image.*;
-
-import javax.imageio.*;
 import javax.swing.SwingUtilities;
 
 
 //added by KT 12/20/2014
-import kEffects.*;
+import kEffects.Explosion;
+import kEffects.ParticleEmitter;
+import sydneyengine.RewindableWorld;
+import sydneyengine.shooter.Bullet.Bullet;
+import sydneyengine.shooter.Gun.FlameThrower;
+import sydneyengine.shooter.Gun.HomingGun;
+import sydneyengine.shooter.Gun.MachineGun;
+import sydneyengine.shooter.Gun.NailGun;
+import sydneyengine.shooter.Gun.Pistol;
+import sydneyengine.shooter.Gun.RocketLauncher;
+import sydneyengine.shooter.Gun.ShotGun;
+import sydneyengine.shooter.Gun.SniperRifle;
+import sydneyengine.shooter.Gun.TranquilizerGun;
+import sydneyengine.shooter.Item.GodlyArmor;
+import sydneyengine.shooter.Item.HealthPack;
+import sydneyengine.shooter.Item.InvisibilityShroud;
+import sydneyengine.shooter.Item.Item;
+import sydneyengine.shooter.Item.SpeedShoes;
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 
 /**
@@ -37,7 +57,6 @@ public class GameWorld extends RewindableWorld {
 	//added by KT 12/20/2014
 	protected ArrayListSS<Explosion> explosions= new ArrayListSS<Explosion>();
 	protected ArrayListSS<ParticleEmitter> peS= new ArrayListSS<ParticleEmitter>();	
-	
 	
 	protected ArrayListSS<ItemSpawner> itemSpawners = new ArrayListSS<ItemSpawner>();
 	protected ArrayListSS<ItemHolder> items = new ArrayListSS<ItemHolder>();
@@ -273,6 +292,8 @@ public class GameWorld extends RewindableWorld {
 			itemsToSpawn.add(new TranquilizerGun(this));
 			itemsToSpawn.add(new RocketLauncher(this));
 			itemsToSpawn.add(new SniperRifle(this));
+			itemsToSpawn.add(new HomingGun(this));
+			itemsToSpawn.add(new NailGun(this));	
 			
 			itemSpawners.add(new ItemSpawner(this, itemsToSpawn, pt.x, pt.y, 10));
 		}
@@ -318,7 +339,7 @@ public class GameWorld extends RewindableWorld {
 		for (int i = 0; i < 4; i++){
 			Player botPlayer = new Bot();
 			botPlayer.setWorld(this);
-			// add a random time to the bot's lastDeathTimeSeconds so that it spawns at a rarandomly
+			// add a random time to the bot's lastDeathTimeSeconds so that it spawns at a randomly
 			this.incrementAndReSeedRandom();
 			botPlayer.setLastDeathTimeSeconds(this.getTotalElapsedSeconds() + this.getRandom().nextFloat()*2);
 			botPlayer.setName("bot_"+i);
@@ -362,6 +383,7 @@ public class GameWorld extends RewindableWorld {
 		items.add(item);
 	}
 
+	@Override
 	protected void doMaxTimeMove(double seconds, double timeAtStartOfMoveSeconds) {
 		numDoMaxTimeMoves++;
 		double timeAtEndOfMoveSeconds = timeAtStartOfMoveSeconds + seconds;
@@ -379,15 +401,21 @@ public class GameWorld extends RewindableWorld {
 			p.doMove(seconds, timeAtStartOfMoveSeconds);
 			for(int k=0; k < getPlayers().get(j).messages.size(); k++)
 			{
-				if(p.messages.get(k).getTimeStamp()+ p.getViewPane().maxTimeToKeepMessageTextEventsSeconds 
+				// Note that for most players the viewPane will be null, only the player controlled by this VM will have a non-null viewPane.
+				if(p.getViewPane()==null){ // System.out.println("VIEWPANE IS NULL");
+				
+				}
+				else
+				if(p.messages.get(k).getTimeStamp()+ p.getViewPane().maxTimeToKeepMessageTextEventsSeconds  // <-- Null here possible 12/23/2014. 9:53 P.M
 						< getTotalElapsedSeconds() + getElapsedSeconds())
 				{
 					p.messages.remove(k);
-					//i--;
+					//k--;
 				}	
 			}
 			assert getPlayers().get(j).getWorld() == this : getPlayers().get(j).getWorld() + ", " + this;
 		}
+		
 		for (int j = 0; j < getTeams().size(); j++) {
 			getTeams().get(j).doMove(seconds, timeAtStartOfMoveSeconds);
 		}
@@ -578,10 +606,34 @@ public class GameWorld extends RewindableWorld {
 	}
 
 	public void addChatText(ChatText e) {//Player player, double timeStamp, String text){
-		// ====================== Cheats!
-		if (e.getText().toLowerCase().equals("speed")) {
-			e.getPlayer().setSpeedMultiplier(2.5f, e.getTimeStamp(), 15f);
+		
+		//=========================== [ cheats ]
+		
+		if (e.getText().toLowerCase().equals("give me speed")) { // speed
+			e.getPlayer().setSpeedMultiplier(2.5f, e.getTimeStamp(), 90);
 		}
+		if(e.getText().toLowerCase().equals("give me allguns")) { // all guns
+			e.getPlayer().assignGun(new NailGun(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new MachineGun(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new ShotGun(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new TranquilizerGun(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new RocketLauncher(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new SniperRifle(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new FlameThrower(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new HomingGun(this), e.getTimeStamp());
+			e.getPlayer().assignGun(new Pistol(this), e.getTimeStamp());
+		}
+		if(e.getText().toLowerCase().equals("give me armor")) { // invincibility
+			e.getPlayer().setArmored(e.getTimeStamp(), 90);
+		}
+		if(e.getText().equals("give me stealth")) { // invisibility
+			e.getPlayer().setInvisible(e.getTimeStamp(), 90);
+		}
+		
+		//=================================================================
+		
+		
+		
 		if (e.getText().toLowerCase().startsWith("numbots")) {
 			// only grabs the last digit, so there's a max of nine bots that can be requested.
 			String numBotsString = e.getText().substring(e.getText().length()-1, e.getText().length());
@@ -672,11 +724,13 @@ public class GameWorld extends RewindableWorld {
 		getRandom().setSeed(seed);
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		assert checkPlayersHaveDiffSSCodes() : "players == " + getPlayers();
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		assert checkPlayersHaveDiffSSCodes() : "players == " + getPlayers();

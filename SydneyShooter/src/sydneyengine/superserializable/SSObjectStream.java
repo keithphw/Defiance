@@ -1,7 +1,6 @@
 package sydneyengine.superserializable;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.ArrayList;
 
 public interface SSObjectStream extends SSConstants{
 	public void setInstalledClasses(ArrayList<Class> classList);

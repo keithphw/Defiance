@@ -9,8 +9,8 @@
 
 package sydneyengine;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -45,6 +45,7 @@ public class Sender extends Thread{//, Runnable{
 		this.controller = controller;
 	}
 	
+	@Override
 	public void run(){
 		ArrayList<QueuedMessage> copyOfMessages = new ArrayList<QueuedMessage>(50);
 		while(shouldRun){

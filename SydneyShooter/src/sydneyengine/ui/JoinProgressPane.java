@@ -6,9 +6,9 @@
 
 package sydneyengine.ui;
 
+import javax.swing.JDialog;
+
 import sydneyengine.shooter.ViewPane;
-import javax.swing.*;
-import sydneyengine.*;
 /**
  *
  * @author  Leeder
@@ -40,7 +40,8 @@ public class JoinProgressPane extends javax.swing.JPanel {
 
         jButton1.setText("Cancel");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel(evt);
             }
         });

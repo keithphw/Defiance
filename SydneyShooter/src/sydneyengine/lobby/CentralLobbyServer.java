@@ -9,12 +9,25 @@
  */
 package sydneyengine.lobby;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
-import sydneyengine.network.*;
-import sydneyengine.superserializable.*;
-import sydneyengine.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import sydneyengine.GameConstants;
+import sydneyengine.network.Address;
+import sydneyengine.network.ByteServer;
+import sydneyengine.network.ByteServerMina;
+import sydneyengine.network.ConnectionServer;
+import sydneyengine.network.ConnectionServerListener;
+import sydneyengine.network.ConnectionServerMina;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  * This is run on the central server, kindly hosted by Riven in Amsterdam.
@@ -142,6 +155,7 @@ public class CentralLobbyServer implements ConnectionServerListener, GameConstan
 		return connectedGamers;
 	}
 	
+	@Override
 	public void connectionMade(ByteServer byteServer){
 		(new CentralConnectionWelcomer(byteServer, this)).start();
 	}
@@ -156,6 +170,7 @@ public class CentralLobbyServer implements ConnectionServerListener, GameConstan
 			this.centralLobbyServer = centralLobbyServer;
 		}
 
+		@Override
 		public void run() {
 			Thread.currentThread().setName(this.getClass().getSimpleName() + " " + Thread.currentThread().getName());
 			
@@ -213,6 +228,7 @@ public class CentralLobbyServer implements ConnectionServerListener, GameConstan
 			this.centralLobbyServer = centralLobbyServer;
 		}
 
+		@Override
 		public void run() {
 			Thread.currentThread().setName(this.getClass().getSimpleName() + " " + Thread.currentThread().getName());
 			//System.out.println(this.getClass().getSimpleName() + ": started");
@@ -239,7 +255,7 @@ public class CentralLobbyServer implements ConnectionServerListener, GameConstan
 								if (messageType == CentralLobbyServer.CLIENT_TO_SERVER_NEW_HOSTED_GAME) {
 									HostedGame newHostedGame = (HostedGame) ssin.readObject();
 									System.out.println(this.getClass().getSimpleName()+": new hosted game from connectedGamer.getRemoteInetAddress() == "+connectedGamer.getRemoteInetAddress());
-									newHostedGame.setInetSocketAddress(new InetSocketAddress(connectedGamer.getRemoteInetAddress(), sydneyengine.shooter.GameFrame.DEFAULT_PORT_TCP));
+									newHostedGame.setInetSocketAddress(new InetSocketAddress(connectedGamer.getRemoteInetAddress(), GameConstants.DEFAULT_PORT_TCP));
 									lobbyInfo.getHostedGames().add(newHostedGame);
 									connectedGamer.setHostedGame(newHostedGame);
 									// send the ConnectedGamers the new LobbyInfo with the newly created game!

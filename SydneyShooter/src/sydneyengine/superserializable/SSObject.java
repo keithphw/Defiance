@@ -1,6 +1,7 @@
 package sydneyengine.superserializable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 //author: Keith Woodward
 
 public interface SSObject extends SSConstants{

@@ -5,7 +5,9 @@
 
 package sydneyengine.superserializable;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 /**
  *
  * @author woodwardk
@@ -13,10 +15,12 @@ import java.io.*;
 public class TestSon extends TestDad{
 	int two = 2;
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		//out.writeFields(this);
 	}
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		//in.readFields(this);

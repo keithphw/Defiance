@@ -5,11 +5,11 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  *
  * @author CommanderKeith
@@ -30,6 +30,7 @@ public class PlayerKeyEvent extends PlayerEvent{
 		this.keyCode = keyCode;
 	}
 	
+	@Override
 	public void applyNow(GameWorld world){
 		super.applyNow(world);
 		
@@ -85,11 +86,13 @@ public class PlayerKeyEvent extends PlayerEvent{
 		
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		out.writeFields(this);
 	}
 	
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException{	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		in.readFields(this);

@@ -5,10 +5,11 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+
+import sydneyengine.RewindableWorld;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  *
  * @author CommanderKeith
@@ -22,6 +23,7 @@ public class ChangeTeamEvent extends PlayerEvent{
 		super(player);
 		this.newTeam = newTeam;
 	}
+	@Override
 	public void apply(RewindableWorld world){
 		super.apply(world);
 		if (player.getCapturableFlag() != null){
@@ -32,11 +34,13 @@ public class ChangeTeamEvent extends PlayerEvent{
 		newTeam.addPlayer(player);
 		player.respawn();
 	}
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		out.writeInt(newTeam.getSSCode());
 	}
 	
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException{	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		int newTeamSSCode = in.readInt();

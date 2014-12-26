@@ -8,13 +8,24 @@
  */
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.*;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import java.io.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import sydneyengine.EventWrapper;
+import sydneyengine.shooter.Bullet.Bullet;
+import sydneyengine.shooter.Gun.Gun;
+import sydneyengine.shooter.Gun.Pistol;
+import sydneyengine.shooter.Item.Item;
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.SSAdapter;
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *
@@ -107,16 +118,15 @@ public class Player extends SSAdapter{
 	 */
 	public void respawn() {
 		//is this really random?
-		r= new Random();
 		resetGuns();
 		addAndUseGun(new Pistol(world));
 		
-		angle = (float) 0;
+		angle = 0;
 
 		maxSpeed = 100;
 		maxFrictAccel = -25;
-		x = (float) (this.getTeam().getSpawnX());
-		y = (float) (this.getTeam().getSpawnY());
+		x = (this.getTeam().getSpawnX());
+		y = (this.getTeam().getSpawnY());
 		oldX = x;
 		oldY = y;
 		radius = 7;
@@ -248,9 +258,9 @@ public class Player extends SSAdapter{
 		float oldAngle = this.getAngle();
 		if (dead == false) {
 			//float targetGunAngle = (float) getAngle(mouseTargetX - getX(), mouseTargetY - getY());
-			float targetAngle = (float) calcAngle(mouseTargetX, mouseTargetY);
+			float targetAngle = calcAngle(mouseTargetX, mouseTargetY);
 
-			float angleToTurn = (float) (targetAngle - oldAngle);
+			float angleToTurn = targetAngle - oldAngle;
 			// Here we make sure angleToTurn is between -Math.PI and +Math.PI so 
 			// that it's easy to know which way the gun should turn.
 			// The maximum that angleToTurn could be now is + or - 2 * 2*Math.PI.
@@ -302,39 +312,36 @@ public class Player extends SSAdapter{
 		this.updateTurning(seconds);
 		
 		getGun().rotateTurret(seconds, timeAtStartOfMoveSeconds);
+		
+		
 
 		oldX = x;
 		oldY = y;
+		
 		float xCoordToWorkOutAngle = 0;
 		float yCoordToWorkOutAngle = 0;
-		
-		
-		
+	
 		
 		if (dead == false) {
-			if (left == true) {
+			if (left) {
 				xCoordToWorkOutAngle -= 1;
 			}
-			if (right == true) {
+			if (right) {
 				xCoordToWorkOutAngle += 1;
 			}
-			if (up == true) {
+			if (up) {
 				yCoordToWorkOutAngle -= 1;
 			}
-			if (down == true) {
+			if (down) {
 				yCoordToWorkOutAngle += 1;
 			}
 		}
 		speedX = 0f;
 		speedY = 0f;
 		if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-			float dirAngle = (float) calcAngle(xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+			float dirAngle = calcAngle(xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 			dirAngle += Math.PI / 2; // 90 degrees is added on since we want an angle of zero to face up, not to the right (which it is without adding 90 degrees)
-			
-			//---- very wacky movement original based on facing angle --- but is NEEDED by BOTS
-			//speedX = (float) Math.cos(dirAngle + getAngle()) * getCurrentSpeed();
-			//speedY = (float) Math.sin(dirAngle + getAngle()) * getCurrentSpeed();
-			
+
 			
 			//---- new added by KT 12/20/2014 ---- familiar moving system, but will mess up bots if they don't override it
 			speedX = (float) Math.cos(dirAngle - Math.PI/2) * getCurrentSpeed();
@@ -346,8 +353,7 @@ public class Player extends SSAdapter{
 	}
 	public void checkCollisions(double seconds) {
 		//s = t(u + v)/2
-				x = (float) (oldX + seconds * speedX);
-				y = (float) (oldY + seconds * speedY);
+				
 
 				boolean touch = false;
 				ArrayList<Obstacle> obstacles = getWorld().getObstacles();
@@ -355,20 +361,31 @@ public class Player extends SSAdapter{
 				for (int i = 0; i < obstacles.size(); i++) {
 					Obstacle obstacle = obstacles.get(i);
 					KPolygon shape = obstacle.getShape();
-					if (Point2D.Float.distance(x, y, shape.getCentre().x, shape.getCentre().y) > shape.getCircularBound() + radius) {
+					if (Point2D.distance(x, y, shape.getCentre().x, shape.getCentre().y) > shape.getCircularBound() + radius) {
 						continue;
 					}
 					Point2D.Float[] points = shape.getPoints();
 					for (int j = 0; j < points.length; j++) {
 						int jPlus = (j + 1 == points.length ? 0 : j + 1);
-						if (Line2D.Float.linesIntersect(oldX, oldY, x, y, points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
+						if (Line2D.linesIntersect(oldX, oldY, x, y, points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
 							touch = true;
 							hitObstacle = obstacle;
+							this.updateSlideAlong(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, seconds);
 						}
 						if (Line2D.ptSegDist(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, getX(), getY()) < radius) {
 							touch = true;
 							hitObstacle = obstacle;
+							this.updateSlideAlong(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, seconds);
 						}
+						/*
+						if(Point2D.distance(points[j].x, points[j].y, x, y) < radius)
+						{
+							//corner collision
+							touch = true;
+							hitObstacle = obstacle;
+							speedX= -speedX; speedY= -speedY;
+						}
+						*/
 					}
 				}
 				
@@ -379,35 +396,55 @@ public class Player extends SSAdapter{
 				for (int i = 0; i < waters.size(); i++) {
 					Water water = waters.get(i);
 					KPolygon shape = water.getShape();
-					if (Point2D.Float.distance(x, y, shape.getCentre().x, shape.getCentre().y) > shape.getCircularBound() + radius) {
+					if (Point2D.distance(x, y, shape.getCentre().x, shape.getCentre().y) > shape.getCircularBound() + radius) {
 						continue;
 					}
 					Point2D.Float[] points = shape.getPoints();
 					for (int j = 0; j < points.length; j++) {
 						int jPlus = (j + 1 == points.length ? 0 : j + 1);
-						if (Line2D.Float.linesIntersect(oldX, oldY, x, y, points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
+						if (Line2D.linesIntersect(oldX, oldY, x, y, points[j].x, points[j].y, points[jPlus].x, points[jPlus].y)) {
 							touch = true;
 							hitWater = water;
+							this.updateSlideAlong(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, seconds);
 						}
 						if (Line2D.ptSegDist(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, getX(), getY()) < radius) {
 							touch = true;
 							hitWater = water;
+							this.updateSlideAlong(points[j].x, points[j].y, points[jPlus].x, points[jPlus].y, seconds);
 						}
 					}
 				}
 				
 				
 				if (touch) {
-					x = oldX;
-					y = oldY;
-					speedX = 0;
-					speedY = 0;
+					//x = oldX;
+					//y = oldY;
+					//speedX = 0;
+					//speedY = 0;
+				}
+				//else
+				{
+					x = (float) (oldX + seconds * speedX);
+					y = (float) (oldY + seconds * speedY);
 				}
 	}
 
+	public void updateSlideAlong(double x1, double y1, double x2, double y2, double seconds) {
+		x = oldX; y = oldY;
+		
+		Vector normal = Vector.unitNormal(x1, y1, x2, y2, new Point2D.Double(getX(), getY()));
+		Vector speed= new Vector(speedX, speedY);
+		
+		double perpendicular_coef = Vector.dotProduct(normal, speed) - 8;			
+		Vector perpendicular = normal.multiplyScalar(perpendicular_coef);
+
+		this.speedX -= (float)perpendicular.x;
+		this.speedY -= (float)perpendicular.y;
+
+	}
 	public void takeDamage(Bullet b, double deathTimeSeconds) {
 		
-		if (dead == false && !armored) {
+		if (!dead && !armored) {
 			setHitPoints(this.getHitPoints() - b.getDamage());
 			if (getHitPoints() <= 0) {
 				die(deathTimeSeconds, b);
@@ -505,11 +542,10 @@ public class Player extends SSAdapter{
 		this.getWorld().addChatText(new ChatText(b.getPlayer(), "now has a kill streak of "+ b.getPlayer().getKillStreak(), false, this.getLastDeathTimeSeconds()));
 		
 	}
-	Random r;
 	public String getCauseOfDeath(Bullet b)
 	{
-		
-		int n= (int)Math.floor(r.nextInt(90)/30); // 0,1,2, or 3
+		world.incrementAndReSeedRandom();
+		int n= (int)Math.floor(world.getRandom().nextInt(119)/30); // 0,1,2, or 3
 		String s= b.getClass().getSimpleName();
 		String result= "killed by a mysterious cause.";
 		if(s.equals("MachineGunBullet")) 
@@ -524,8 +560,22 @@ public class Player extends SSAdapter{
 			if(n==0) result= "given an overdose of Tylenol";
 			else if(n==1) result= "tranquilized";
 			else if(n==2) result= "put to sleep";
-				else result= "stunned by his sudden lifelessness";
+			else result= "stunned by his sudden lifelessness";
 			}
+		else if(s.equals("HomingBullet"))
+		{
+			if(n==0) result= "homed in on";
+			else if(n==1) result= "sent back home";
+			else if(n==2) result= "found with a homing missile";
+			else result= "followed and assassinated";
+		}
+		else if(s.equals("NailBullet"))
+		{
+			if(n==0) result= "nailed";
+			else if(n==1) result= "brought down with construction gear";
+			else if(n==2) result= "hammered and nailed";
+			else result= "pricked";
+		}
 		else if(s.equals("PistolBullet")) 
 			{
 			if(n==0) result= "plonked with a plain pistol";
@@ -586,7 +636,8 @@ public class Player extends SSAdapter{
 		return a * d - b * c;
 	}
 
-	static boolean getLineLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, Point2D.Double intersection) {
+	// where the intersection is the result
+	public static boolean getLineLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, Point2D.Double intersection) {
 		if (!Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
 			return false;
 		}
@@ -649,9 +700,10 @@ public class Player extends SSAdapter{
 			
 			//==== fancy color healthbar
 			if(getHitPoints()/getMaxHitPoints()>.6) 
-				g.setColor(Color.GREEN);
-			else if(getHitPoints()/getMaxHitPoints()>.25) g.setColor(Color.YELLOW);
-			else g.setColor(Color.RED);
+				g.setColor(Color.green);
+			else if(getHitPoints()/getMaxHitPoints()>.25) g.setColor(Color.yellow);
+			else g.setColor(Color.red);
+
 			
 			
 			float xWidthOfGreen = healthBarWidth * getHitPoints() / getMaxHitPoints();
@@ -775,6 +827,7 @@ public class Player extends SSAdapter{
 		return radius;
 	}
 
+	@Override
 	public String toString() {
 		return "Player_" + getName() + "_" + getSSCode();
 	}
@@ -828,11 +881,13 @@ public class Player extends SSAdapter{
 		this.mouseTargetY = mouseTargetY;
 	}
 
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException {		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		out.writeInt((int)this.getLatencyToServerNanos());
 	}
 
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException {	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		this.setLatencyToServerNanos(in.readInt());
@@ -990,6 +1045,7 @@ public class Player extends SSAdapter{
 		}else{
 			try {
 				javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						assert thisPlayer.getWorld() != null : thisPlayer;
 						assert getWorld().getController() != null;

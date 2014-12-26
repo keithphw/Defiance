@@ -1,9 +1,20 @@
 package com.grexengine.jgf;
 
-import java.io.*;
-import java.util.*;
-import java.util.jar.*;
-import java.util.zip.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 //import org.apache.log4j.*;
 
@@ -195,7 +206,7 @@ public class ClassPath
     Iterator i = keys.iterator();
     while( i.hasNext() )
     {
-      Object key = (Object) i.next();
+      Object key = i.next();
       String value = (String) atts.get( key );
 
       //logger.debug( jar.getName() + "  " + key + ": " + value );

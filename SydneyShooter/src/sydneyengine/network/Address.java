@@ -19,8 +19,12 @@ package sydneyengine.network;
  * @author Brian Wellington
  */
 
-import java.net.*;
-import java.util.*;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Address {
 	

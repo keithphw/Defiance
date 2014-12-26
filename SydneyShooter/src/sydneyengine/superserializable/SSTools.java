@@ -1,9 +1,14 @@
 package sydneyengine.superserializable;
 
 //author: Keith Woodward
-import com.grexengine.jgf.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.grexengine.jgf.ClassLocater;
 
 /**
  * SSTools defines static utility methods. 
@@ -97,10 +102,11 @@ public abstract class SSTools implements SSConstants {
 			// no need to add copies.
 			if (sortedSSClasses.contains(clazz) == false) {
 				//System.out.println(SSTools.class.getSimpleName()+".makeSortedSSClasses(): adding class "+clazz.getName());
-				System.out.println("ssClassesToPreInstall.add(Class.forName(\"" + clazz.getName() + "\"));");
+				//System.out.println("ssClassesToPreInstall.add(Class.forName(\"" + clazz.getName() + "\"));");
 				sortedSSClasses.add(clazz);
 			}
 		}
+		System.out.println("\nSSTools.makeSortedSSClasses(): all needed classes pre-installed.");
 		// Different VM's do different ordering so need to re-order alphabetically
 		// bubble sort!
 		boolean keepGoing = true;

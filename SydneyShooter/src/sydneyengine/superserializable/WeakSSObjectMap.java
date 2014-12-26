@@ -9,9 +9,19 @@
 
 package sydneyengine.superserializable;
 
-import java.util.*;
-import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.AbstractCollection;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 
 public class WeakSSObjectMap<K extends SSObject,V>
@@ -114,7 +124,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 */
 	public WeakSSObjectMap() {
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		threshold = (int)(DEFAULT_INITIAL_CAPACITY);
+		threshold = (DEFAULT_INITIAL_CAPACITY);
 		table = new Entry[DEFAULT_INITIAL_CAPACITY];
 	}
 	
@@ -255,6 +265,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * entries that will be removed before next attempted access
 	 * because they are no longer referenced.
 	 */
+	@Override
 	public int size() {
 		if (size == 0)
 			return 0;
@@ -268,6 +279,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * entries that will be removed before next attempted access
 	 * because they are no longer referenced.
 	 */
+	@Override
 	public boolean isEmpty() {
 		return size() == 0;
 	}
@@ -380,6 +392,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 *         (A <tt>null</tt> return can also indicate that the map
 	 *         previously associated <tt>null</tt> with <tt>key</tt>.)
 	 */
+	@Override
 	public V put(K k, V value) {
 		if (k == null){
 			throw new IllegalArgumentException("Ah!!!!!!!! k == null");
@@ -476,6 +489,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * @param m mappings to be stored in this map.
 	 * @throws  NullPointerException if the specified map is null.
 	 */
+	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
 		int numKeysToBeAdded = m.size();
 		if (numKeysToBeAdded == 0)
@@ -588,6 +602,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * Removes all of the mappings from this map.
 	 * The map will be empty after this call returns.
 	 */
+	@Override
 	public void clear() {
 		// clear out ref queue. We don't need to expunge entries
 		// since table is getting cleared.
@@ -615,6 +630,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * @return <tt>true</tt> if this map maps one or more keys to the
 	 *         specified value
 	 */
+	@Override
 	public boolean containsValue(Object value) {
 		if (value==null)
 			return containsNullValue();
@@ -660,21 +676,25 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			this.next  = next;
 		}
 		
+		@Override
 		public K getKey() {
 			//return WeakSSObjectMap.<K>unmaskNull(get());
 			return get();
 		}
 		
+		@Override
 		public V getValue() {
 			return value;
 		}
 		
+		@Override
 		public V setValue(V newValue) {
 			V oldValue = value;
 			value = newValue;
 			return oldValue;
 		}
 		
+		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof Map.Entry))
 				return false;
@@ -691,6 +711,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			return false;
 		}
 		
+		@Override
 		public int hashCode() {
 			K k = getKey();
 			Object v = getValue();
@@ -698,6 +719,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 					(v==null ? 0 : v.hashCode()));
 		}
 		
+		@Override
 		public String toString() {
 			return getKey() + "=" + getValue();
 		}
@@ -725,6 +747,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			index = (size() != 0 ? table.length : 0);
 		}
 		
+		@Override
 		public boolean hasNext() {
 			Entry[] t = table;
 			
@@ -760,6 +783,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			return lastReturned;
 		}
 		
+		@Override
 		public void remove() {
 			if (lastReturned == null)
 				throw new IllegalStateException();
@@ -775,18 +799,21 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	}
 	
 	private class ValueIterator extends HashIterator<V> {
+		@Override
 		public V next() {
 			return nextEntry().value;
 		}
 	}
 	
 	private class KeyIterator extends HashIterator<K> {
+		@Override
 		public K next() {
 			return nextEntry().getKey();
 		}
 	}
 	
 	private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
+		@Override
 		public Map.Entry<K,V> next() {
 			return nextEntry();
 		}
@@ -810,24 +837,29 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * operations.  It does not support the <tt>add</tt> or <tt>addAll</tt>
 	 * operations.
 	 */
+	@Override
 	public Set<K> keySet() {
 		Set<K> ks = newKeySet;
 		return (ks != null ? ks : (newKeySet = new KeySet()));
 	}
 	
 	private class KeySet extends AbstractSet<K> {
+		@Override
 		public Iterator<K> iterator() {
 			return new KeyIterator();
 		}
 		
+		@Override
 		public int size() {
 			return WeakSSObjectMap.this.size();
 		}
 		
+		@Override
 		public boolean contains(Object o) {
 			return containsKey(o);
 		}
 		
+		@Override
 		public boolean remove(Object o) {
 			if (containsKey(o)) {
 				WeakSSObjectMap.this.remove(o);
@@ -836,6 +868,7 @@ public class WeakSSObjectMap<K extends SSObject,V>
 				return false;
 		}
 		
+		@Override
 		public void clear() {
 			WeakSSObjectMap.this.clear();
 		}
@@ -854,24 +887,29 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not
 	 * support the <tt>add</tt> or <tt>addAll</tt> operations.
 	 */
+	@Override
 	public Collection<V> values() {
 		Collection<V> vs = newValues;
 		return (vs != null ?  vs : (newValues = new Values()));
 	}
 	
 	private class Values extends AbstractCollection<V> {
+		@Override
 		public Iterator<V> iterator() {
 			return new ValueIterator();
 		}
 		
+		@Override
 		public int size() {
 			return WeakSSObjectMap.this.size();
 		}
 		
+		@Override
 		public boolean contains(Object o) {
 			return containsValue(o);
 		}
 		
+		@Override
 		public void clear() {
 			WeakSSObjectMap.this.clear();
 		}
@@ -891,16 +929,19 @@ public class WeakSSObjectMap<K extends SSObject,V>
 	 * <tt>clear</tt> operations.  It does not support the
 	 * <tt>add</tt> or <tt>addAll</tt> operations.
 	 */
+	@Override
 	public Set<Map.Entry<K,V>> entrySet() {
 		Set<Map.Entry<K,V>> es = entrySet;
 		return es != null ? es : (entrySet = new EntrySet());
 	}
 	
 	private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+		@Override
 		public Iterator<Map.Entry<K,V>> iterator() {
 			return new EntryIterator();
 		}
 		
+		@Override
 		public boolean contains(Object o) {
 			if (!(o instanceof Map.Entry))
 				return false;
@@ -910,14 +951,17 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			return candidate != null && candidate.equals(e);
 		}
 		
+		@Override
 		public boolean remove(Object o) {
 			return removeMapping(o) != null;
 		}
 		
+		@Override
 		public int size() {
 			return WeakSSObjectMap.this.size();
 		}
 		
+		@Override
 		public void clear() {
 			WeakSSObjectMap.this.clear();
 		}
@@ -930,10 +974,12 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			return list;
 		}
 		
+		@Override
 		public Object[] toArray() {
 			return deepCopy().toArray();
 		}
 		
+		@Override
 		public <T> T[] toArray(T[] a) {
 			return deepCopy().toArray(a);
 		}
@@ -956,20 +1002,24 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			this.value = e.getValue();
 		}
 		
+		@Override
 		public K getKey() {
 			return key;
 		}
 		
+		@Override
 		public V getValue() {
 			return value;
 		}
 		
+		@Override
 		public V setValue(V value) {
 			V oldValue = this.value;
 			this.value = value;
 			return oldValue;
 		}
 		
+		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof Map.Entry))
 				return false;
@@ -977,11 +1027,13 @@ public class WeakSSObjectMap<K extends SSObject,V>
 			return eq(key, e.getKey()) && eq(value, e.getValue());
 		}
 		
+		@Override
 		public int hashCode() {
 			return ((key   == null)   ? 0 :   key.hashCode()) ^
 					((value == null)   ? 0 : value.hashCode());
 		}
 		
+		@Override
 		public String toString() {
 			return key + "=" + value;
 		}

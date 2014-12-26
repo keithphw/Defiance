@@ -6,12 +6,16 @@
 
 package sydneyengine.ui;
 
-import sydneyengine.shooter.ViewPane;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import sydneyengine.*;
+
+import javax.swing.JDialog;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+
+import sydneyengine.shooter.ViewPane;
 
 /**
  *
@@ -56,20 +60,22 @@ public class JoinPane extends javax.swing.JPanel {
 
         jLabel2.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 36));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("se");
+        jLabel2.setText("Defiance");
 
-        serverNameOrIPTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        serverNameOrIPTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
         jButton1.setText("Join!");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 joinGame(evt);
             }
         });
 
         jButton2.setText("Cancel");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelJoinGame(evt);
             }
         });
@@ -141,9 +147,10 @@ public class JoinPane extends javax.swing.JPanel {
 		final JDialog dialog = new JDialog(v.getGameFrame());
 		dialog.setTitle("Join Progress");
 		dialog.setModal(true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		// Need to implement cancelling the join process mid-way thru.
 		dialog.addWindowListener(new WindowAdapter(){
+			@Override
 			public void windowClosing(WindowEvent e){
 				//close();
 			}
@@ -154,6 +161,7 @@ public class JoinPane extends javax.swing.JPanel {
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(v);
 		Thread t = new Thread(new Runnable(){
+			@Override
 			public void run(){
 				try {
 					// bug here - exiting JDialog doesn't terminate the join method...

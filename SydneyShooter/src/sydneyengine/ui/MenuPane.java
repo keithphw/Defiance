@@ -6,12 +6,11 @@
 
 package sydneyengine.ui;
 
+import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+
 import sydneyengine.shooter.ViewPane;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import sydneyengine.*;
 /**
  *
  * @author  Leeder
@@ -27,6 +26,7 @@ public class MenuPane extends javax.swing.JPanel {
 		
 		// To give focus to the viewPane once this menu is destroyed
 		f.addInternalFrameListener(new InternalFrameAdapter(){
+			@Override
 			public void internalFrameClosed(InternalFrameEvent e){
 				v.requestFocus();
 			}
@@ -53,7 +53,8 @@ public class MenuPane extends javax.swing.JPanel {
         optionsButton.setText("Perfomance options"); // NOI18N
         optionsButton.setToolTipText("Geeky stuff");
         optionsButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 options(evt);
                 jButton1createGame(evt);
             }
@@ -61,25 +62,28 @@ public class MenuPane extends javax.swing.JPanel {
 
         jLabel2.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 36));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("se"); // NOI18N
+        jLabel2.setText("Defiance"); // NOI18N
 
         quitButton.setText("Quit game"); // NOI18N
         quitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quit(evt);
             }
         });
 
         changeTeamButton.setText("Teams and scores"); // NOI18N
         changeTeamButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeTeam(evt);
             }
         });
 
         returnToGameButton.setText("Return to game"); // NOI18N
         returnToGameButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 returnToGame(evt);
             }
         });
@@ -87,7 +91,8 @@ public class MenuPane extends javax.swing.JPanel {
         playerOptions.setText("Help!"); // NOI18N
         playerOptions.setToolTipText("Tells you what to do and describes what the keys are.");
         playerOptions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 playerOptionsreturnToGame(evt);
                 playerOptions(evt);
             }
@@ -96,7 +101,8 @@ public class MenuPane extends javax.swing.JPanel {
         returnToGameButton1.setText("Switch look and feel!"); // NOI18N
         returnToGameButton1.setActionCommand("Switch look and feel!");
         returnToGameButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 switchLookAndFeel(evt);
             }
         });

@@ -9,7 +9,7 @@
 
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
+import sydneyengine.superserializable.SSAdapter;
 /**
  *
  * @author CommanderKeith

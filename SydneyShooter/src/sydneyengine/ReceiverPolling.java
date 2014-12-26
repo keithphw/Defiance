@@ -9,9 +9,10 @@
 
 package sydneyengine;
 
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 
 /**
  *

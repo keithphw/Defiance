@@ -5,10 +5,9 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.*;
-import sydneyengine.superserializable.*;
-import java.util.*;
-import java.awt.geom.*;
+import java.awt.geom.Point2D;
+
+import sydneyengine.superserializable.SSAdapter;
 /**
  *
  * @author Phillip
@@ -92,6 +91,7 @@ public class BBox extends SSAdapter{
 		this.y = y;
 	}
 	
+	@Override
 	public String toString(){
 		return "x"+x+", y"+y+", w"+w+", h"+h;
 	}

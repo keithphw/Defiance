@@ -9,9 +9,10 @@
 
 package sydneyengine.shooter;
 
-import sydneyengine.superserializable.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+
+import sydneyengine.superserializable.SSObjectInputStream;
+import sydneyengine.superserializable.SSObjectOutputStream;
 /**
  *
  * @author CommanderKeith
@@ -29,6 +30,7 @@ public class PlayerMouseWheelEvent extends PlayerEvent{
 		this.wheelRotation = wheelRotation;
 	}
 	
+	@Override
 	public void applyNow(GameWorld world){
 		super.applyNow(world);
 		player.cycleGunsForwardBy(wheelRotation, getTimeStamp());
@@ -39,11 +41,13 @@ public class PlayerMouseWheelEvent extends PlayerEvent{
 		return wheelRotation;
 	}
 	
+	@Override
 	public void writeSS(SSObjectOutputStream out) throws IOException{		// this is the method that you over-ride if you want custom serialization
 		super.writeSS(out);
 		out.writeFields(this);
 	}
 	
+	@Override
 	public void readSS(SSObjectInputStream in) throws java.io.IOException{	// this is the method that you over-ride if you want custom serialization
 		super.readSS(in);
 		in.readFields(this);

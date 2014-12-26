@@ -2,9 +2,16 @@ package sydneyengine.superserializable;
 
 //author: Keith Woodward
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SSObjectInputStream extends DataInputStream implements SSObjectStream{
 	
@@ -28,6 +35,7 @@ public class SSObjectInputStream extends DataInputStream implements SSObjectStre
 		return ssout;
 	}
 	// This method syncs the 2 streams storedObjects wih each other. It only needs to be called once, ie once you call a.syncStoredObjectsWith(b), you don't need to call b.syncStoredObjectsWith(a).
+	@Override
 	public void syncStoredObjectsWith(SSObjectStream stream){
 		if (stream instanceof SSObjectOutputStream == false){
 			throw new IllegalArgumentException(this.getClass().getSimpleName()+" can only be sync'ed with an SSObjectOutputStream, not an "+stream.getClass().getSimpleName());
@@ -39,6 +47,7 @@ public class SSObjectInputStream extends DataInputStream implements SSObjectStre
 		}
 	}
 	
+	@Override
 	public void setInstalledClasses(ArrayList<Class> classList){
 		if (installedClassIndexes == null){
 			installedClassIndexes = new HashMap<Short, Class>(classList.size()*2);
@@ -389,6 +398,7 @@ public class SSObjectInputStream extends DataInputStream implements SSObjectStre
 	protected WeakSSObjectMap<SSObject, Object> getStoredObjects(){
 		return storedObjects;
 	}
+	@Override
 	public SSObject getStoredObject(int ssCode){
 		if (ssout != null){
 			synchronized (storedObjectsMutex){
@@ -400,6 +410,7 @@ public class SSObjectInputStream extends DataInputStream implements SSObjectStre
 		}
 	}
 	
+	@Override
 	public void putStoredObject(SSObject sso){
 		if (ssout != null){
 			ssout.putStoredObjectSynchronized(sso);
@@ -426,6 +437,7 @@ public class SSObjectInputStream extends DataInputStream implements SSObjectStre
 		}
 	}
 
+	@Override
 	public FieldCache getFieldCache() {
 		return fieldCache;
 	}

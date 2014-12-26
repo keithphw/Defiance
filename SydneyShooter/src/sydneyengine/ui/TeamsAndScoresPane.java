@@ -5,15 +5,15 @@
  */
 package sydneyengine.ui;
 
-import sydneyengine.shooter.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import sydneyengine.*;
 //import sydneyengine.superserializable.*;
-import java.util.*;
+import java.util.ArrayList;
+
+import javax.swing.JInternalFrame;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+
+import sydneyengine.shooter.Player;
+import sydneyengine.shooter.ViewPane;
 
 /**
  *
@@ -34,6 +34,7 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 		playersTable.setModel(model);
 	}
 	
+	@Override
 	public void doMove(double seconds, double timeAtStartOfMoveSeconds){
 		playersTable.tableChanged(new TableModelEvent(playersTable.getModel()));
 		playersTable.revalidate();
@@ -55,11 +56,12 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 
         jLabel2.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 36));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("se"); // NOI18N
+        jLabel2.setText("Defiance"); // NOI18N
 
         returnToGameButton.setText("Return to game"); // NOI18N
         returnToGameButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 returnToGameButtonreturnToGame(evt);
             }
         });
@@ -79,7 +81,8 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 
         switchTeamButton.setText("Switch team"); // NOI18N
         switchTeamButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 switchTeamButtonreturnToGame(evt);
             }
         });
@@ -120,6 +123,7 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 			this.players = players;
 		}
 
+		@Override
 		public String getColumnName(int col) {
 			if (col == 0) {
 				return "Player";
@@ -138,15 +142,18 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 			}
 		}
 
+		@Override
 		public int getRowCount() {
 			lastReturnedValueOfGetRowCount = players.size();
 			return players.size();
 		}
 
+		@Override
 		public int getColumnCount() {
 			return 6;
 		}
 
+		@Override
 		public Object getValueAt(int row, int col) {
 			if (col == 0) {
 				return getPlayers().get(row).getName();
@@ -165,15 +172,18 @@ public class TeamsAndScoresPane extends javax.swing.JPanel implements Updatable{
 			}
 		}
 
+		@Override
 		public boolean isCellEditable(int row, int col) {
 			return false;
 		}
 
+		@Override
 		public Class getColumnClass(int c) {
 			Object theObject = getValueAt(0, c);
 			return theObject.getClass();
 		}
 
+		@Override
 		public void setValueAt(Object value, int row, int col) {
 		//rowData[row][col] = value;
 		//fireTableCellUpdated(row, col);

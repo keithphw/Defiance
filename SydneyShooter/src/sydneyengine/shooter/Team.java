@@ -10,15 +10,10 @@
 package sydneyengine.shooter;
 
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.geom.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
-import sydneyengine.superserializable.*;
+import java.awt.Color;
+
+import sydneyengine.superserializable.ArrayListSS;
+import sydneyengine.superserializable.SSAdapter;
 
 public class Team extends SSAdapter{
 	GameWorld world;

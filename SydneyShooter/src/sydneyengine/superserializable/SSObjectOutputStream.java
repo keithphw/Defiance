@@ -2,9 +2,16 @@ package sydneyengine.superserializable;
 
 //author: Keith Woodward
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SSObjectOutputStream extends DataOutputStream implements SSObjectStream{
 	
@@ -25,6 +32,7 @@ public class SSObjectOutputStream extends DataOutputStream implements SSObjectSt
 	
 	protected SSObjectInputStream ssin = null;
 	// This method syncs the 2 streams storedObjects wih each other. It only needs to be called once, ie once you call a.syncStoredObjectsWith(b), you don't need to call b.syncStoredObjectsWith(a).
+	@Override
 	public void syncStoredObjectsWith(SSObjectStream stream){
 		if (stream instanceof SSObjectInputStream == false){
 			throw new IllegalArgumentException(this.getClass().getSimpleName()+" can only be sync'ed with an SSObjectInputStream, not an "+stream.getClass().getSimpleName());
@@ -38,6 +46,7 @@ public class SSObjectOutputStream extends DataOutputStream implements SSObjectSt
 
 	
 	// must be done if using the UDP protocol since then there is no stuff up if a crucial packet that binds a class to an automatically generated index goes missing.
+	@Override
 	public void setInstalledClasses(ArrayList<Class> classList){
 		if (installedClassIndexes == null){
 			installedClassIndexes = new HashMap<Class, Short>(classList.size()*2);
@@ -385,6 +394,7 @@ public class SSObjectOutputStream extends DataOutputStream implements SSObjectSt
 	protected WeakSSObjectMap<SSObject, Object> getStoredObjects(){
 		return storedObjects;
 	}
+	@Override
 	public SSObject getStoredObject(int ssCode){
 		if (ssin != null){
 			synchronized (storedObjectsMutex){
@@ -395,6 +405,7 @@ public class SSObjectOutputStream extends DataOutputStream implements SSObjectSt
 			return getStoredObjects().modifiedGet(ssCode);
 		}
 	}
+	@Override
 	public void putStoredObject(SSObject sso){
 		if (ssin != null){
 			ssin.putStoredObjectSynchronized(sso);
@@ -421,6 +432,7 @@ public class SSObjectOutputStream extends DataOutputStream implements SSObjectSt
 		}
 	}
 
+	@Override
 	public FieldCache getFieldCache() {
 		return fieldCache;
 	}

@@ -6,9 +6,9 @@
 
 package sydneyengine.ui;
 
+import javax.swing.JInternalFrame;
+
 import sydneyengine.shooter.ViewPane;
-import javax.swing.*;
-import sydneyengine.*;
 /**
  *
  * @author  Leeder
@@ -151,14 +151,16 @@ public class PlayerPropertySettings extends javax.swing.JPanel {
 
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButton(evt);
             }
         });
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButton(evt);
             }
         });

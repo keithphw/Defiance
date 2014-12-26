@@ -5,11 +5,11 @@
  */
 
 package sydneyengine.ui;
-import sydneyengine.shooter.ViewPane;
-import sydneyengine.shooter.ChatTextEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import sydneyengine.*;
+
+import sydneyengine.shooter.ChatTextEvent;
+import sydneyengine.shooter.ViewPane;
 /**
  *
  * @author  Leeder
@@ -45,12 +45,14 @@ public class StatusMenu extends javax.swing.JPanel {
 
         messageField.setToolTipText("Type messages here to chat to allies or taunt enemies. Press Enter to send.");
         messageField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 messageFieldActionPerformed(evt);
             }
         });
         messageField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
+            @Override
+			public void keyPressed(java.awt.event.KeyEvent evt) {
                 messageFieldKeyPressed(evt);
             }
         });
@@ -58,7 +60,8 @@ public class StatusMenu extends javax.swing.JPanel {
         allyChatSelector.setText("Allies only");
         allyChatSelector.setToolTipText("If turned on, sends text to allies only. Otherwise, everyone hears.");
         allyChatSelector.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 allyChatSelectorActionPerformed(evt);
             }
         });
@@ -67,7 +70,8 @@ public class StatusMenu extends javax.swing.JPanel {
         sendMessageButton.setToolTipText("Press to send, or press enter in the message field.");
         sendMessageButton.setPreferredSize(new java.awt.Dimension(60, 23));
         sendMessageButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sendMessageButtonActionPerformed(evt);
             }
         });
@@ -75,7 +79,8 @@ public class StatusMenu extends javax.swing.JPanel {
         menuButton.setText("Menu");
         menuButton.setPreferredSize(new java.awt.Dimension(60, 23));
         menuButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menu(evt);
             }
         });
