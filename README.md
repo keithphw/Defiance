@@ -2,14 +2,14 @@
 
 
 
-### What is this repository for? ###
+### Defiance ###
 
 * Quick summary
 This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework.
 
 * Version 1.0.1
 
-### How do I get set up? ###
+### Setting Up and Playing ###
 
 Dependencies: 
 The jars are included in the SydneyDependencyJars folder.
