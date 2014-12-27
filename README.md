@@ -5,8 +5,8 @@
 This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework (version 2.0.9).
 
 * Version 1.0.1
-* Website: [](http://greenlantern101.github.io/Defiance/)
-* Wiki: [](https://github.com/GreenLantern101/Defiance/wiki)
+* Website: [http://greenlantern101.github.io/Defiance/](http://greenlantern101.github.io/Defiance/)
+* Wiki: [https://github.com/GreenLantern101/Defiance/wiki](https://github.com/GreenLantern101/Defiance/wiki)
 
 ### Screenshots ###
 ![After which I succumbed to great firepower.](https://github.com/GreenLantern101/Defiance/blob/master/SydneyShooter/Defiance2.PNG "After which I succumbed to great firepower.")
