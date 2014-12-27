@@ -1,18 +1,21 @@
 
 ### Defiance ###
 
-* Quick summary *
-This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework.
+* Quick summary
+This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework (version 2.0.9).
 
-* Version 1.0.1 *
+* Version 1.0.1
+* Website: ![http://greenlantern101.github.io/Defiance/](http://greenlantern101.github.io/Defiance/)
+* Wiki: ![https://github.com/GreenLantern101/Defiance/wiki](https://github.com/GreenLantern101/Defiance/wiki)
 
 ### Screenshots ###
-![alt text](https://github.com/GreenLantern101/Defiance/blob/master/SydneyShooter/Defiance2.PNG "After which I succumbed to great firepower.")
+![After which I succumbed to great firepower.](https://github.com/GreenLantern101/Defiance/blob/master/SydneyShooter/Defiance2.PNG "After which I succumbed to great firepower.")
 
 ### Setting Up and Playing ###
 
 Dependencies: 
 The jars are included in the SydneyDependencyJars folder.
+Just load the Eclipse Project, and run the GameFrame.java class.
 
 
 ======[ Controls ]====== 
@@ -70,13 +73,14 @@ The wi-fi on laptops may cause noticeable lag over local LAN, but still very pla
 				
 This was slightly modified from the excellent Sydney Engine v. 0.2, made by Keith Woodward,  whom can find me on the forums at www.javagaming.org or contact through keithphw@hotmail.com . If you'd like to expand on this game, you can download the source code of Sydney Engine on www.javagaming.org, just search for 'SydneyEngine'.
 
-
+* For more information, please consult the wiki.
 
 ### Contribution guidelines ###
 
 * For changes, please consult the ChangeLog.
 
 TODO:
+
 Fix internet gameplay, make networking more dependable
 
 Achievements??? - 1st kill, 3rd, 10th, 20th, 30th, 50th, 75th, 100th, 150th, 300th, 500th kills
@@ -87,16 +91,23 @@ Make personal pop-up alerts configurable
 Enhance graphics
 
 Mech Suits support?
+
 Destructable walls- possibly by using subtractive polygons
+
 Map Editor/Maker!
 
 ======= when adding a new Gun:
+
 1. Make new gun, and bullet class
+
 2. Update the statement in Player class of what killed description should be
+
 3. Update all the itemSpawners in gameworld class to spawn it
+
 4. Update bots to spawn it when respawning
+
 5. Update help menu info
 
-### Who do I talk to? ###
+### Contacts ###
 
 You can reach me at tiger201655@yahoo.com
