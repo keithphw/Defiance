@@ -1,6 +1,3 @@
-# README #
-
-
 
 ### Defiance ###
 
@@ -8,6 +5,9 @@
 This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework.
 
 * Version 1.0.1
+
+### Screenshots ###
+![alt text](https://github.com/GreenLantern101/Defiance/blob/master/SydneyShooter/Defiance2.PNG "After which I succumbed to great firepower.")
 
 ### Setting Up and Playing ###
 
@@ -38,6 +38,7 @@ Tranquilizer Gun - Fires in short bursts, stunning enemies and slowing them and 
 Rocket Launcher - launches rockets that have a large explosion radius. More damage is dealt to objects that are closer to the epicenter of the explosion.
 Homing Gun - launches three alien-technology orbs that will fire like a regular bullet unless there is an enemy in front of it, in which case it will automatically follow that target. The orbs are relatively slow, but are still useful around corners and against dug-in defenders.
 Nail Gun - An alternative to the machine gun, that spits out 3 nails at once very rapidly, but watch out for your ammo depletion, since it comes with a small clip considering its rate of fire.
+
 ***Note***
 Both the Flamethrower and the Rocket Launcher are Variable-Range weapons, that is, their bullets can detonate or stick at a  certain range away from the weapon by using the mouse to aim.
 				
@@ -47,6 +48,7 @@ Healthpack - Restores 33% health.
 Godly Armor - Grants invincibility against all weapons for 15 seconds, but player can still be tranquilized.
 Speed Shoes - Significantly speeds up travel.
 Invisibility Shroud - Enemies can't see and target you for 15 seconds.
+
 ***Note***
 You can only use one of either the Godly Armor or the Invisibility Shroud, but not both. But, the Speedy Shoes can be used with anything.
 				
