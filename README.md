@@ -1,10 +1,10 @@
 
 ### Defiance ###
 
-* Quick summary
+* Quick summary *
 This is an enhanced version of the Sydney Engine multiplayer shooter game, written in Java originally by Keith Woodward in 2008, using the Apache Mina networking framework.
 
-* Version 1.0.1
+* Version 1.0.1 *
 
 ### Screenshots ###
 ![alt text](https://github.com/GreenLantern101/Defiance/blob/master/SydneyShooter/Defiance2.PNG "After which I succumbed to great firepower.")
@@ -30,13 +30,21 @@ Escape: displays menu.
 ======[ Weapons ]====== 
 
 Pistol - Basic weapon with low damage.
+
 Machine Gun - Standard rapid-firing rotating gatling.
+
 Flamethrower - Close-range weapon that sprays napalm that will stick around for a while, useful for area denial. The napalm will cause damage to anyone that walks over it.
-Shotgun - Dual-shot weapon that fires a cloud of pellets. Most effective at close ranges
+
+Shotgun - Dual-shot weapon that fires a cloud of pellets. Most effective at close ranges.
+
 Sniping Rifle - Accurate for long-distance one-hit kills, but slow-firing.
+
 Tranquilizer Gun - Fires in short bursts, stunning enemies and slowing them and making them unable to fire.
+
 Rocket Launcher - launches rockets that have a large explosion radius. More damage is dealt to objects that are closer to the epicenter of the explosion.
+
 Homing Gun - launches three alien-technology orbs that will fire like a regular bullet unless there is an enemy in front of it, in which case it will automatically follow that target. The orbs are relatively slow, but are still useful around corners and against dug-in defenders.
+
 Nail Gun - An alternative to the machine gun, that spits out 3 nails at once very rapidly, but watch out for your ammo depletion, since it comes with a small clip considering its rate of fire.
 
 ***Note***
@@ -45,9 +53,13 @@ Both the Flamethrower and the Rocket Launcher are Variable-Range weapons, that i
 ======[ Items ]====== 
 
 Healthpack - Restores 33% health.
+
 Godly Armor - Grants invincibility against all weapons for 15 seconds, but player can still be tranquilized.
+
 Speed Shoes - Significantly speeds up travel.
+
 Invisibility Shroud - Enemies can't see and target you for 15 seconds.
+
 
 ***Note***
 You can only use one of either the Godly Armor or the Invisibility Shroud, but not both. But, the Speedy Shoes can be used with anything.
@@ -61,6 +73,8 @@ This was slightly modified from the excellent Sydney Engine v. 0.2, made by Keit
 
 
 ### Contribution guidelines ###
+
+* For changes, please consult the ChangeLog.
 
 TODO:
 Fix internet gameplay, make networking more dependable
