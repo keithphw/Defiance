@@ -6,7 +6,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
-// ported from kwuang's c# particle emitter class
 public class ParticleEmitter
     {
         public ArrayList<Particle> particles = new ArrayList<Particle>();

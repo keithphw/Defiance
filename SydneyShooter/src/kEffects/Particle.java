@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.util.Random;
-// ported from kwuang's c# particle class
     public class Particle
     {
         final int lifetime = 30; Color color; double age = 0; int radius = 1;
