@@ -9,6 +9,9 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
@@ -17,6 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
+import sydneyengine.GameConstants;
 
 import sydneyengine.lobby.LobbyInfo;
 import sydneyengine.shooter.ViewPane;
@@ -229,47 +233,42 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
             .add(0, 100, Short.MAX_VALUE)
         );
 
-        jLabel2.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 36));
+        jLabel2.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 36)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Defiance");
+        jLabel2.setText("se");
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Your name:");
 
-        nameTextField.setHorizontalAlignment(SwingConstants.CENTER);
+        nameTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         nameTextField.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nameTextFieldActionPerformed(evt);
             }
         });
         nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-			public void focusLost(java.awt.event.FocusEvent evt) {
+            public void focusLost(java.awt.event.FocusEvent evt) {
                 nameTextFieldFocusLost(evt);
             }
         });
 
         lanGameButton.setText("LAN or single player game");
         lanGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 lanGame(evt);
             }
         });
 
         internetGameButton.setText("Internet games");
         internetGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 internetGame(evt);
             }
         });
 
         exitButton.setText("Exit");
         exitButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitButton(evt);
             }
         });
@@ -308,8 +307,7 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 
         joinSelectedInternetGame.setText("Join selected game!");
         joinSelectedInternetGame.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 joinSelectedInternetGame(evt);
             }
         });
@@ -331,16 +329,14 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 
         refreshButton.setText("Refresh");
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 refreshButtonActionPerformed(evt);
             }
         });
 
         createNewInternetGameButton.setText("Create new game!");
         createNewInternetGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createNewInternetGame(evt);
             }
         });
@@ -349,16 +345,14 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 
         cancelInternetGameButton.setText("Cancel");
         cancelInternetGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelInternetGame(evt);
             }
         });
 
         statsButton.setText("Stats");
         statsButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statsButtonActionPerformed(evt);
             }
         });
@@ -393,7 +387,7 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
                     .add(connectedLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(statsButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
@@ -410,32 +404,28 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 
         createNewLanGameButton.setText("Create new LAN game!");
         createNewLanGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createLanGame(evt);
             }
         });
 
         joinLANGameButton.setText("Join game LAN game!");
         joinLANGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showJoinGameMenu(evt);
             }
         });
 
         cancelLanGameButton.setText("Cancel");
         cancelLanGameButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelLanGame(evt);
             }
         });
 
         createNewLanGameButton1.setText("Single Player Game!");
         createNewLanGameButton1.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createSinglePlayerGame(evt);
             }
         });
@@ -472,18 +462,7 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Thanks to: \nRiven for helping me set up the networked game and generously supplying the central server,"
-        		+ "\nMarkus Borbely for giving me access to the code used in his excellent game 'gunslingers',"
-        		+ "\nKev Glass for helping me to use java WebStart and for making some great tutorials (cokeandcode.com),"
-        		+ "\nAdam Martin (blah^3) for his advice on network game design,"
-        		+ "\nBleb for helping out with some tricky maths and networking stuff,"
-        		+ "\nThijs and Jeff K for pointing me to the Simple Network Timing Protocol, "
-        		+ "\n\nAnd a big thanks to all of the programmers who have made their code available for me to use:"
-        		+ "\nDmitri T and Chris C for the excellent Java2D API,"
-        		+ "\nKirill G for the supurb look and feel of the menus (Substance API),"
-        		+ "\nTrustin Lee from the Apache MINA project."
-        		+ "\n\nCan I also say hi to Mum, Dad, Camille, Andrea, Dominic, Leon, Renee (brothers and sisters), "
-        		+ "Anastasia (the best girlfriend in the world), McAuleys (great cousins) and Spot (the most sensational dog).");
+        jTextArea1.setText("Thanks to: \nRiven for helping me set up the networked game and generously supplying the central server,\nMarkus Borbely for giving me access to the code used in his excellent game 'gunslingers',\nKev Glass for helping me to use java WebStart and for making some great tutorials (cokeandcode.com),\nAdam Martin (blah^3) for his advice on network game design,\nBleb for helping out with some tricky maths and networking stuff,\nThijs and Jeff K for pointing me to the Simple Network Timing Protocol, \n\nAnd a big thanks to all of the programmers who have made their code available for me to use:\nDmitri T and Chris C for the excellent Java2D API,\nKirill G for the supurb look and feel of the menus (Substance API),\nTrustin Lee from the Apache MINA project.");
         jScrollPane3.setViewportView(jTextArea1);
 
         org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
@@ -512,8 +491,8 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPane)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -522,7 +501,7 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
                 .addContainerGap()
                 .add(jLabel2)
                 .add(18, 18, 18)
-                .add(tabbedPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                .add(tabbedPane)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -538,9 +517,20 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 	}//GEN-LAST:event_showJoinGameMenu
 
 	private void createLanGame(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createLanGame
-		//f.dispose();
 		v.getGameFrame().setPlayerName(nameTextField.getText());
-		v.getGameFrame().doCreate(false);
+		boolean internetGame = false;
+		v.getGameFrame().doChooseIPAddressAndPortMenu(v, internetGame);
+		
+//		try{
+//			InetAddress localInetAddress = InetAddress.getLocalHost();
+//			v.getGameFrame().doCreate(new InetSocketAddress(localInetAddress, GameConstants.DEFAULT_PORT_TCP), internetGame);
+//		}catch(UnknownHostException e){
+//			e.printStackTrace();
+//		}
+		
+//		f.dispose();
+//		v.getGameFrame().setPlayerName(nameTextField.getText());
+//		v.getGameFrame().doJoinMenu(v);
 	}//GEN-LAST:event_createLanGame
 
 	private void statsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statsButtonActionPerformed
@@ -563,7 +553,13 @@ public class StartPane extends javax.swing.JPanel implements Updatable {
 
 	private void createNewInternetGame(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createNewInternetGame
 		v.getGameFrame().setPlayerName(nameTextField.getText());
-		v.getGameFrame().doCreate(true);
+		boolean internetGame = true;
+		try{
+			InetAddress localInetAddress = InetAddress.getLocalHost();
+			v.getGameFrame().doCreate(new InetSocketAddress(localInetAddress, GameConstants.DEFAULT_PORT_TCP), internetGame);
+		}catch(UnknownHostException e){
+			e.printStackTrace();
+		}
 	}//GEN-LAST:event_createNewInternetGame
 
 	private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed

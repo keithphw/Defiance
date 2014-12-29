@@ -228,4 +228,8 @@ public abstract class ServingController extends Controller{
 	public long getServerClockDiffNanos() {
 		return 0;
 	}
+	
+	public ConnectionServer getConnectionServer() {
+		return connectionServer;
+	}
 }

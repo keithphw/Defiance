@@ -398,8 +398,8 @@ public class ViewPane extends JComponent implements Updatable, KeyListener, Mous
 			int yStringCoord = 27;
 			int yStringInc = 15;
 			int stringCounter = 0;
-			g.drawString("IP: "+getGameFrame().serverHostIPString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
-			g.drawString("Server Host Name: "+ getGameFrame().serverHostNameString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
+//			g.drawString("IP: "+getGameFrame().serverHostIPString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
+//			g.drawString("Server Host Name: "+ getGameFrame().serverHostNameString, xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			//g.drawString("FPS: " + this.getGameFrame().getController().getFPSCounter().getFPSRounded(), xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			g.drawString("Millis/frame: " + Math.round(getGameFrame().getController().getFPSCounter().getAvTimeBetweenUpdatesMillis() * 10) / 10.0, xStringCoord, yStringCoord + yStringInc * stringCounter++);
 			int seconds = (int) this.getPlayer().getWorld().getTotalElapsedSeconds();

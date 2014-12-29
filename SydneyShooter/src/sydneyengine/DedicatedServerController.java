@@ -6,6 +6,8 @@
 package sydneyengine;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 import sydneyengine.network.ConnectionServerMina;
@@ -174,9 +176,10 @@ public class DedicatedServerController extends ServingController implements Game
 
 		ConnectionServerMina connectionServer = null;
 		try {
+			InetAddress localHostInetAddress = InetAddress.getLocalHost();
 			connectionServer = new ConnectionServerMina();
-			connectionServer.bindAndListen(GameConstants.DEFAULT_PORT_TCP);
-		} catch (java.io.IOException ex) {
+			connectionServer.bindAndListen(new InetSocketAddress(localHostInetAddress, GameConstants.DEFAULT_PORT_TCP));
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			java.awt.Toolkit.getDefaultToolkit().beep();
 			return;

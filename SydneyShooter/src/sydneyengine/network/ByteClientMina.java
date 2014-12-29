@@ -41,8 +41,8 @@ public class ByteClientMina extends IoHandlerAdapter implements ByteClient {
 		connector.setHandler(this);
 		connector.setDefaultRemoteAddress(address);
 		ConnectFuture future1 = connector.connect(address);
-		
-		
+		int maxWaitTimeMillis = 15000;
+		try{future1.await(maxWaitTimeMillis);}catch(Exception e){e.printStackTrace();}
 		if (!future1.isConnected()) {
 			throw new java.io.IOException("ByteClientMina.connect(): Connection failed...");
 		}

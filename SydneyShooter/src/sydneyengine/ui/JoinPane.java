@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JDialog;
 import javax.swing.SwingConstants;
@@ -30,8 +32,15 @@ public class JoinPane extends javax.swing.JPanel {
 	public JoinPane(ViewPane f) {
 		this.v = f;
 		initComponents();
-		serverNameOrIPTextField.setText(f.getGameFrame().getLocalHostIPString());
-		guideTextArea.setText("The IP address of the server computer is needed to connect and join that game. Your IP, for example, is "+f.getGameFrame().getLocalHostIPString()+"\n\nThe server's IP will be written in the top left of their screen. Ask the player who is server to tell you their IP then type it in above and click join.");
+		String exampleLocalHostName = "";
+		try{
+			exampleLocalHostName = InetAddress.getLocalHost().getHostAddress();
+		}catch(UnknownHostException e){
+			e.printStackTrace();
+			exampleLocalHostName = "error";
+		}
+		serverNameOrIPTextField.setText(exampleLocalHostName);
+		guideTextArea.setText("The IP address of the server computer is needed to connect and join that game. Your IP, for example, is "+exampleLocalHostName+"\n\nThe server's IP will be written in the top left of their in-game help menu. Ask the player who is server to tell you their IP address then type it in above and click join.");
 	}
 	
 	/** This method is called from within the constructor to

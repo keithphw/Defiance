@@ -42,6 +42,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -56,8 +57,8 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tabbedPane" alignment="1" pref="495" max="32767" attributes="0"/>
-                  <Component id="jLabel2" alignment="1" pref="495" max="32767" attributes="0"/>
+                  <Component id="tabbedPane" alignment="1" max="32767" attributes="0"/>
+                  <Component id="jLabel2" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -69,7 +70,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="tabbedPane" pref="396" max="32767" attributes="0"/>
+              <Component id="tabbedPane" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -426,7 +427,7 @@
                     <Property name="columns" type="int" value="20"/>
                     <Property name="lineWrap" type="boolean" value="true"/>
                     <Property name="rows" type="int" value="5"/>
-                    <Property name="text" type="java.lang.String" value="Thanks to: &#xa;Riven for helping me set up the networked game and generously supplying the central server,&#xa;Markus Borbely for giving me access to the code used in his excellent game &apos;gunslingers&apos;,&#xa;Kev Glass for helping me to use java WebStart and for making some great tutorials (cokeandcode.com),&#xa;Adam Martin (blah^3) for his advice on network game design,&#xa;Bleb for helping out with some tricky maths and networking stuff,&#xa;Thijs and Jeff K for pointing me to the Simple Network Timing Protocol, &#xa;&#xa;And a big thanks to all of the programmers who have made their code available for me to use:&#xa;Dmitri T and Chris C for the excellent Java2D API,&#xa;Kirill G for the supurb look and feel of the menus (Substance API),&#xa;Trustin Lee from the Apache MINA project.&#xa;&#xa;Can I also say hi to Mum, Dad, Camille, Andrea, Dominic, Leon, Renee (brothers and sisters), Anastasia (the best girlfriend in the world), McAuleys (great cousins) and Spot (the most sensational dog)."/>
+                    <Property name="text" type="java.lang.String" value="Thanks to: &#xa;Riven for helping me set up the networked game and generously supplying the central server,&#xa;Markus Borbely for giving me access to the code used in his excellent game &apos;gunslingers&apos;,&#xa;Kev Glass for helping me to use java WebStart and for making some great tutorials (cokeandcode.com),&#xa;Adam Martin (blah^3) for his advice on network game design,&#xa;Bleb for helping out with some tricky maths and networking stuff,&#xa;Thijs and Jeff K for pointing me to the Simple Network Timing Protocol, &#xa;&#xa;And a big thanks to all of the programmers who have made their code available for me to use:&#xa;Dmitri T and Chris C for the excellent Java2D API,&#xa;Kirill G for the supurb look and feel of the menus (Substance API),&#xa;Trustin Lee from the Apache MINA project."/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -18,12 +18,10 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -60,6 +58,7 @@ import sydneyengine.superserializable.FieldCache;
 import sydneyengine.superserializable.SSCodeAllocator;
 import sydneyengine.superserializable.SSObject;
 import sydneyengine.superserializable.WeakSSObjectMap;
+import sydneyengine.ui.ChooseIPAddressAndPortPane;
 import sydneyengine.ui.ControlsPane;
 import sydneyengine.ui.GameDesktopPane;
 import sydneyengine.ui.HelpPane;
@@ -122,11 +121,11 @@ public class GameFrame extends JFrame implements GameConstants {
 	int waitToCloseMillis = 250;
 	protected int portNumTCP = DEFAULT_PORT_TCP;
 	protected int portNumUDP = DEFAULT_PORT_UDP;
-	protected InetAddress localHost = null;
-	protected String localHostNameString = null;
-	protected String localHostIPString = null;
-	String serverHostNameString = null;
-	String serverHostIPString = null;
+//	protected InetAddress localHost = null;
+//	protected String localHostNameString = null;
+//	protected String localHostIPString = null;
+//	String serverHostNameString = null;
+//	String serverHostIPString = null;
 	protected Preferences userPrefs = Preferences.userRoot().node(title);
 	LobbyClient lobbyClient;
 	protected String playerName;
@@ -203,15 +202,15 @@ public class GameFrame extends JFrame implements GameConstants {
 				
 			}
 		});
-		localHost = null;
-		try {
-			localHost = InetAddress.getLocalHost();
-			localHostNameString = localHost.getHostName();
-			localHostIPString = localHost.getHostAddress();
-		} catch (UnknownHostException ex) {
-			System.out.println(this.getClass().getSimpleName() + ": Can't get local host");
-			ex.printStackTrace();
-		}
+//		localHost = null;
+//		try {
+//			localHost = InetAddress.getLocalHost();
+//			localHostNameString = localHost.getHostName();
+//			localHostIPString = localHost.getHostAddress();
+//		} catch (UnknownHostException ex) {
+//			System.out.println(this.getClass().getSimpleName() + ": Can't get local host");
+//			ex.printStackTrace();
+//		}
 		final JPanel bigPane = new JPanel(new BorderLayout());
 		bigPane.setOpaque(false);
 		setContentPane(bigPane);
@@ -244,8 +243,8 @@ public class GameFrame extends JFrame implements GameConstants {
 			this.getController().closeAndWait(waitToCloseMillis);
 		}
 
-		serverHostNameString = this.localHostNameString;
-		serverHostIPString = this.localHostIPString;
+//		serverHostNameString = this.localHostNameString;
+//		serverHostIPString = this.localHostIPString;
 
 		Player player = new Player();
 		player.setName(getPlayerName());
@@ -339,8 +338,8 @@ public class GameFrame extends JFrame implements GameConstants {
 		ByteClientMina byteClientMina = new ByteClientMina();
 		try {
 			byteClientMina.connect(addr);
-			serverHostNameString = addr.getHostName();
-			serverHostIPString = addr.getAddress().getHostAddress();
+//			serverHostNameString = addr.getHostName();
+//			serverHostIPString = addr.getAddress().getHostAddress();
 		} catch (java.io.IOException ex) {
 			throw ex;
 		}
@@ -661,6 +660,30 @@ public class GameFrame extends JFrame implements GameConstants {
 		return somePane;
 	}
 
+	public void doChooseIPAddressAndPortMenu(ViewPane viewPane, boolean internetGame) {
+		desktopPane.removeAllNonMainComponents();
+
+		JInternalFrame internalFrame = null;
+		//Create the internal frame if necessary.
+		if (internalFrame == null || internalFrame.isClosed()) {
+			internalFrame = new JInternalFrame("Choose IP Address Menu");
+			internalFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			internalFrame.setLayout(new BorderLayout());
+			ChooseIPAddressAndPortPane joinPane = new ChooseIPAddressAndPortPane(viewPane, internetGame);
+			internalFrame.setContentPane(joinPane);
+
+			internalFrame.setResizable(true);
+			internalFrame.setIconifiable(false);
+			internalFrame.setMaximizable(false);
+			internalFrame.setClosable(false);
+			internalFrame.pack();
+			internalFrame.setLocation((this.getWidth() - internalFrame.getWidth()) / 2, (this.getHeight() - internalFrame.getHeight()) / 2);
+			//And we mustn't forget to add it to the desktop pane!
+			desktopPane.add(internalFrame, JLayeredPane.MODAL_LAYER);
+			internalFrame.setVisible(true);
+		}
+	}
+	
 	public void doJoinMenu(ViewPane viewPane) {
 		desktopPane.removeAllNonMainComponents();
 
@@ -798,15 +821,15 @@ public class GameFrame extends JFrame implements GameConstants {
 	 * 
 	 * @param internetGame if true uses internet game settings from GameConstants which have a high lag tolerance, if false uses high-preformance LAN game settings.
 	 */
-	public void doCreate(boolean internetGame) {
+	public void doCreate(InetSocketAddress inetSocketAddress, boolean internetGame) {
 		System.out.println(this.getClass().getSimpleName() + ": doCreate method");
-		serverHostNameString = this.localHostNameString;
-		serverHostIPString = this.localHostIPString;
+//		serverHostNameString = this.localHostNameString;
+//		serverHostIPString = this.localHostIPString;
 		
 		ConnectionServer connectionServer = null;
 		try {
 			connectionServer = new ConnectionServerMina();
-			connectionServer.bindAndListen(portNumTCP);
+			connectionServer.bindAndListen(inetSocketAddress);
 		} catch (java.io.IOException ex) {
 			ex.printStackTrace();
 			Toolkit.getDefaultToolkit().beep();
@@ -910,18 +933,18 @@ public class GameFrame extends JFrame implements GameConstants {
 	
 	public void doCreateSinglePlayer(boolean internetGame) {
 		System.out.println(this.getClass().getSimpleName() + ": doCreate method");
-		serverHostNameString = this.localHostNameString;
-		serverHostIPString = this.localHostIPString;
+//		serverHostNameString = this.localHostNameString;
+//		serverHostIPString = this.localHostIPString;
 		
-		ConnectionServer connectionServer = null;
-		try {
-			connectionServer = new ConnectionServerMina();
-			connectionServer.bindAndListen(portNumTCP);
-		} catch (java.io.IOException ex) {
-			ex.printStackTrace();
-			Toolkit.getDefaultToolkit().beep();
-			return;
-		}
+//		ConnectionServer connectionServer = null;
+//		try {
+//			connectionServer = new ConnectionServerMina();
+//			connectionServer.bindAndListen(portNumTCP);
+//		} catch (java.io.IOException ex) {
+//			ex.printStackTrace();
+//			Toolkit.getDefaultToolkit().beep();
+//			return;
+//		}
 		Player player = new Player();
 		player.setName(getPlayerName());
 
@@ -993,9 +1016,9 @@ public class GameFrame extends JFrame implements GameConstants {
 			this.getController().closeAndWait(waitToCloseMillis);
 		}
 		setController(controller);
-		ConnectionWelcomer connectionWelcomer = new ConnectionWelcomer(controller);
-		connectionServer.setConnectionServerListener(connectionWelcomer);
-		controller.setConnectionServer(connectionServer);
+//		ConnectionWelcomer connectionWelcomer = new ConnectionWelcomer(controller);
+//		connectionServer.setConnectionServerListener(connectionWelcomer);
+//		controller.setConnectionServer(connectionServer);
 
 		//setTitle(title);
 		this.getDesktopPane().removeAll();
@@ -1082,13 +1105,13 @@ public class GameFrame extends JFrame implements GameConstants {
 //		SSTools.setSSClassesToPreInstall(ssClassesToPreInstall);
 		
 	}
-	public InetAddress getLocalHost() {
-		return localHost;
-	}
-
-	public String getLocalHostNameString() {
-		return localHostNameString;
-	}
+//	public InetAddress getLocalHost() {
+//		return localHost;
+//	}
+//
+//	public String getLocalHostNameString() {
+//		return localHostNameString;
+//	}
 
 	public void close() {
 		if (getController() != null) {
@@ -1125,9 +1148,9 @@ public class GameFrame extends JFrame implements GameConstants {
 		this.viewPane = viewPane;
 	}
 
-	public String getLocalHostIPString() {
-		return localHostIPString;
-	}
+//	public String getLocalHostIPString() {
+//		return localHostIPString;
+//	}
 
 	public String getPlayerName() {
 		return playerName;

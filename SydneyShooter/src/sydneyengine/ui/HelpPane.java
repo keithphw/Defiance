@@ -7,6 +7,8 @@
 package sydneyengine.ui;
 
 import javax.swing.JInternalFrame;
+import sydneyengine.Controller;
+import sydneyengine.ServingController;
 
 import sydneyengine.shooter.ViewPane;
 
@@ -21,8 +23,16 @@ public class HelpPane extends javax.swing.JPanel {
 	public HelpPane(final ViewPane v, final JInternalFrame f) {
 		this.v = v;
 		this.f = f;
+		Controller c = v.getGameFrame().getController();
 		initComponents();
-		String text = "Aim: Capture the flag and bring it back to your team's nearest base to score a point.\n" +
+		String serverIPAddressAndSocketExplanationString = "";
+		if (c instanceof ServingController){
+			serverIPAddressAndSocketExplanationString += "You are the server and your IP address and port is: "+((ServingController)c).getConnectionServer().getInetSocketAddress().toString();
+			serverIPAddressAndSocketExplanationString += "\n";
+		}
+		String text = 
+				serverIPAddressAndSocketExplanationString+
+				"Aim: Capture the flag and bring it back to your team's nearest base to score a point.\n" +
 				"\n======[ Controls ]======\n"+
 				"Move with Arrow keys or W, A, S, D\n"+
 				"Left mouse click: fires weapon\n"+

@@ -97,7 +97,9 @@ public class CentralLobbyServer implements ConnectionServerListener, GameConstan
 	public void start() throws java.io.IOException{
 		ConnectionServer connectionServer = new ConnectionServerMina();
 		connectionServer.setConnectionServerListener(this);
-		connectionServer.bindAndListen(LOBBY_SERVER_PORT);
+		
+		InetAddress localHostInetAddress = InetAddress.getLocalHost();
+		connectionServer.bindAndListen(new InetSocketAddress(localHostInetAddress, GameConstants.LOBBY_SERVER_PORT));
 
 		centralInfoSenderAndReceiver.start();
 	}

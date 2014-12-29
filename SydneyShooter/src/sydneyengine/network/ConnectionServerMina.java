@@ -4,6 +4,7 @@
  */
 package sydneyengine.network;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -16,12 +17,14 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 public class ConnectionServerMina extends IoHandlerAdapter implements ConnectionServer{
 	SocketAcceptor acceptor;
 	ConnectionServerListener listener;
+	InetSocketAddress inetSocketAddress;
 	
 	public ConnectionServerMina(){
 	}
 	
 	@Override
-	public void bindAndListen(int port) throws java.io.IOException {
+	public void bindAndListen(InetSocketAddress inetSocketAddress) throws java.io.IOException {
+		this.inetSocketAddress = inetSocketAddress;
 		acceptor = new NioSocketAcceptor();
 		acceptor.setReuseAddress(true);
 		acceptor.getFilterChain().addLast("compressor", new CompressionFilter());
@@ -29,11 +32,16 @@ public class ConnectionServerMina extends IoHandlerAdapter implements Connection
 		acceptor.getSessionConfig().setTcpNoDelay(true);
 		//chain.addLast("logger", new LoggingFilter());
 
-		acceptor.setDefaultLocalAddress(new InetSocketAddress(port));
+		//acceptor.setDefaultLocalAddress(new InetSocketAddress(port));
+		acceptor.setDefaultLocalAddress(inetSocketAddress);
 		acceptor.setHandler(this);
 		acceptor.bind();
 		
 		System.out.println(this.getClass().getSimpleName()+": Listening...");
+	}
+	
+	public InetSocketAddress getInetSocketAddress(){
+		return inetSocketAddress;
 	}
 	
 	@Override
@@ -88,6 +96,7 @@ public class ConnectionServerMina extends IoHandlerAdapter implements Connection
 	public void setConnectionServerListener(ConnectionServerListener listener) {
 		this.listener = listener;
 	}
+	
 /*
 	public static void main(String[] args){
 		try{
